@@ -709,6 +709,7 @@
 		scope = "project",
 		kind = "string",
 		allowed = {
+			"OSXAppEx",
 			"OSXBundle",
 			"OSXFramework",
 			"XCTest",
@@ -1773,6 +1774,10 @@
 
 	filter { "system:darwin", "kind:SharedLib" }
 		targetextension ".dylib"
+
+	filter { "system:darwin", "kind:SharedLib", "sharedlibtype:OSXAppEx" }
+		targetprefix ""
+		targetextension ".appex"
 
 	filter { "system:darwin", "kind:SharedLib", "sharedlibtype:OSXBundle" }
 		targetprefix ""

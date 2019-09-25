@@ -265,6 +265,31 @@
 		]]
 	end
 
+	function suite.PBXFileReference_ListsOSXAppExTarget()
+		kind "SharedLib"
+		sharedlibtype "OSXAppEx"
+		prepare()
+		xcode.PBXFileReference(tr)
+		test.capture [[
+/* Begin PBXFileReference section */
+		31B0855257D6B504BEDDAB92 /* MyProject.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = MyProject.appex; path = MyProject.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+		]]
+	end
+
+
+	function suite.PBXFileReference_ListsIOSOSXAppExTarget()
+		_TARGET_OS = "ios"
+		kind "SharedLib"
+		sharedlibtype "OSXAppEx"
+		prepare()
+		xcode.PBXFileReference(tr)
+		test.capture [[
+/* Begin PBXFileReference section */
+		31B0855257D6B504BEDDAB92 /* MyProject.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = MyProject.appex; path = MyProject.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+		]]
+	end
 
 
 	function suite.PBXFileReference_ListsSourceFiles()
@@ -1428,6 +1453,27 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_DYNAMIC_NO_PIC = NO;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				PRODUCT_NAME = MyProject;
+			};
+			name = Debug;
+		};
+		]]
+	end
+
+
+	function suite.XCBuildConfigurationTarget_OnOSXAppEx()
+		kind "SharedLib"
+		sharedlibtype "OSXAppEx"
+		prepare()
+		xcode.XCBuildConfiguration_Target(tr, tr.products.children[1], tr.configs[1])
+		test.capture [[
+		F90F3867BC7AFA19FB1E9EA7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = bin/Debug;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
 				PRODUCT_NAME = MyProject;
 			};
 			name = Debug;
