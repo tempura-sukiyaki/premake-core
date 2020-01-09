@@ -237,6 +237,8 @@
 			local tbl = table.merge({
 				['android.compileSdkVersion'] = 28,
 				['android.defaultConfig.minSdkVersion'] = 14,
+				['android.defaultConfig.versionCode'] = 1,
+				['android.defaultConfig.versionName'] = '1.0',
 				['android.externalNativeBuild.cmake.path'] = 'CMakeLists.txt',
 			}, prj.projectbuildgradle)
 			for key, value in pairs(tbl) do
