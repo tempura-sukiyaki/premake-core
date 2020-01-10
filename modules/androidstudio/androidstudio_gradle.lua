@@ -251,7 +251,9 @@
 			local indices = split_index('android.defaultConfig.externalNativeBuild.cmake.arguments')
 			local key, value = get_indices_and_value(buildgradle, indices)
 			value = table.unique(table.flatten({
-				p.quoted('-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir}/' .. path.getrelative(prj.location, _MAIN_SCRIPT_DIR)),
+				function ()
+					return string.format('"-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\\\", "/")}/%s"', path.getrelative(prj.location, _MAIN_SCRIPT_DIR))
+				end,
 				value,
 			}))
 			table.sort(value)
@@ -262,7 +264,7 @@
 		do
 			local indices = split_index('android.flavorDimensions')
 			local key, value = get_indices_and_value(buildgradle, indices)
-			buildgradle[key or indices] = table.unique(table.flatten({ 'platforms', value }))
+			buildgradle[key or indices] = table.unique(table.flatten({ 'premake.platforms', value }))
 		end
 
 		for cfg in project.eachconfig(prj) do
@@ -295,7 +297,7 @@
 					local indices = split_index('android.productFlavors[%s].dimension', quoted(cfg.platform, true))
 					local key, value = get_indices_and_value(buildgradle, indices)
 					if not key then
-						buildgradle[indices] = 'platforms'
+						buildgradle[indices] = 'premake.platforms'
 					end
 				end
 
