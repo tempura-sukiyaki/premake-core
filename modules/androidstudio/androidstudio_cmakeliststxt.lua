@@ -53,7 +53,7 @@
 			C90 = 90,
 			C99 = 99,
 			C11 = 11,
-			gnu89 = 99,
+			gnu89 = 90,
 			gnu90 = 90,
 			gnu99 = 99,
 			gnu11 = 11,
@@ -64,14 +64,14 @@
 	function cmake.cppdialect(cfg)
 		LUT = {
 			['C++98'] = 98,
-			['C++0x'] = 98,
+			['C++0x'] = 11,
 			['C++11'] = 11,
 			['C++1y'] = 14,
 			['C++14'] = 14,
 			['C++1z'] = 17,
 			['C++17'] = 17,
 			['gnu++98'] = 98,
-			['gnu++0x'] = 98,
+			['gnu++0x'] = 11,
 			['gnu++11'] = 11,
 			['gnu++1y'] = 14,
 			['gnu++14'] = 14,
@@ -89,7 +89,7 @@
 			return '-Wno-' .. opt
 		end)
 		local fatalwarnings = table.translate(cfg.fatalwarnings, function(opt)
-			return '-Wno-' .. opt
+			return '-Werror-' .. opt
 		end)
 		return table.join(enablewarnings, disablewarnings, fatalwarnings)
 	end
@@ -225,7 +225,7 @@
 					end
 					for _, v in ipairs(fcfg.buildoutputs) do
 						table.insert(info.outputs, v)
-					end 
+					end
 					table.insert(buildcommandinfos, info)
 				end
 			}, true)
@@ -241,7 +241,7 @@
 					end
 				end
 			end
-	
+
 			buildcommands[cfg] = {}
 			local leftover = #buildcommandinfos
 			while leftover > 0 do
@@ -347,7 +347,7 @@
 				end
 			end
 			-- add_dependencies
-			
+
 			-- target_include_directories
 			if cmakekind then
 				local options = table.translate(cfg.sysincludedirs, function(opt)
@@ -407,14 +407,14 @@
 				--if cfg.flags.MultiProcessorCompile then
 				--	--p.x('cmake_host_system_information(RESULT NumberOfLogicalCores QUERY NUMBER_OF_LOGICAL_CORES)')
 				--	p.x('cmake_host_system_information(RESULT NumberOfPhysicalCores QUERY NUMBER_OF_PHYSICAL_CORES)')
-				--	--p.x('math(EXPR ProcessMax "${NumberOfPhysicalCores} + 1")')
+				--	p.x('math(EXPR ProcessMax "${NumberOfPhysicalCores} + 1")')
 				--	tbl['ANDROID_PROCESS_MAX'] = '${ProcessMax}'
 				--else
 				--	tbl['ANDROID_PROCESS_MAX'] = '1'
 				--end
-				if prj.kind == p.STATICLIB then
+				if cmakekind == 'STATIC' then
 					tbl['ARCHIVE_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
-				elseif prj.kind == p.SHAREDLIB then
+				elseif cmakekind == 'SHARED' then
 					tbl['LIBRARY_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
 				end
 				do
@@ -472,7 +472,7 @@
 				end
 			end
 			-- target_compile_options
- 
+
 			-- target_link_libraries
 			if cmakekind then
 				local libdirs = table.unique(table.join(
@@ -480,7 +480,7 @@
 					cfg.syslibdirs
 				))
 				libdirs = table.translate(libdirs, function(opt)
-					local dir = iif(path.isabsolute(opt), opt, path.join(prj.location, opt)) 
+					local dir = iif(path.isabsolute(opt), opt, path.join(prj.location, opt))
 					return cmake.quoted('-L' .. cmake.getpath(dir))
 				end)
 				local options = table.join(libdirs)
