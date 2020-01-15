@@ -176,9 +176,9 @@ ext {
 	function suite.OnWorkspaceBuildGradle_ext_keys_overwrite()
 		project '*'
 		workspacebuildgradle {
-			['ext.overwrite'] = 'overwrite1',
-			['ext["overwrite"]'] = 'overwrite2',
-			["ext['overwrite']"] = 'overwrite3',
+			['ext.overwrite'] = 'overwrite',
+			['ext["overwrite"]'] = 'overwrite',
+			["ext['overwrite']"] = 'overwrite',
 		}
 		prepare_workspacebuildgradle()
 		test.capture [[
@@ -200,7 +200,7 @@ buildscript {
 }
 
 ext {
-	overwrite = "overwrite3"
+	overwrite = "overwrite"
 }
 		]]
 	end
