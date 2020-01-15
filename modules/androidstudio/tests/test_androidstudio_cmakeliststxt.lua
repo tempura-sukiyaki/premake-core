@@ -3,7 +3,6 @@
 -- Automated test suite for Android Studio project generation.
 ---
 
-
 	local suite = test.declare("androidstudio_project_cmakeliststxt")
 	local p = premake
 	local androidstudio = p.modules.androidstudio
@@ -21,21 +20,25 @@
 		--p.indent("  ")
 		io.eol = '\n'
 		wks = test.createWorkspace()
+		test.createproject(wks, 2)
+		test.createproject(wks, 3)
 	end
 
 	local function prepare()
+		project '*'
+		location 'Workspace'
+		project 'MyProject'
+		location 'Workspace/MyProject'
+		project 'MyProject2'
+		location 'Workspace/MyProject2'
+		kind 'StaticLib'
+		project 'MyProject3'
+		location 'Workspace/MyProject3'
+		kind 'SharedLib'
 		wks = p.oven.bakeWorkspace(wks)
 		prj1 = test.getproject(wks, 1)
-		project 'MyProject'
-		location 'MyProject'
-		prj2 = test.createproject(wks, 2)
-		project 'MyProject2'
-		location 'MyProject2'
-		kind 'StaticLib'
-		prj3 = test.createproject(wks, 3)
-		project 'MyProject3'
-		location 'MyProject3'
-		kind 'SharedLib'
+		prj2 = test.getproject(wks, 2)
+		prj3 = test.getproject(wks, 3)
 	end
 
 --
@@ -70,8 +73,8 @@ cmake_minimum_required(VERSION 3.6.4)
 # add_subdirectory
 if(NOT TARGET "MyProject2")
 	add_subdirectory(
-		"${PREMAKE_MAIN_SCRIPT_DIR}/MyProject2"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
 		)
 endif()
 		]]
@@ -87,8 +90,8 @@ endif()
 # add_subdirectory
 if(NOT TARGET "MyProject2")
 	add_subdirectory(
-		"${PREMAKE_MAIN_SCRIPT_DIR}/MyProject2"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
 		)
 endif()
 		]]
@@ -130,10 +133,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		)
-endif()
 		]]
 	end
 
@@ -146,11 +145,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -168,11 +162,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c"
 		)
@@ -198,15 +187,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cxx"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c++"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cc"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cxx"
-		)
-endif()
 		]]
 	end
 
@@ -220,21 +200,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -253,10 +218,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" STATIC
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" STATIC
-		)
-endif()
 		]]
 	end
 
@@ -269,11 +230,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" STATIC
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" STATIC
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -295,21 +251,6 @@ if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
 endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" STATIC
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" STATIC
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" STATIC
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
 		]]
 	end
 
@@ -321,10 +262,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		)
 endif()
@@ -344,11 +281,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
 		]]
 	end
 
@@ -362,21 +294,6 @@ endif()
 		test.capture [[
 # add_library
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	add_library("MyProject" SHARED
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -454,11 +371,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-endif()
 		]]
 	end
 
@@ -472,21 +384,6 @@ endif()
 		test.capture [[
 # target_include_directories
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_include_directories("MyProject" SYSTEM PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
 		)
@@ -507,11 +404,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
 		]]
 	end
 
@@ -525,21 +417,6 @@ endif()
 		test.capture [[
 # target_include_directories
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_include_directories("MyProject" PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
 		)
@@ -564,14 +441,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
 		]]
 	end
 
@@ -586,30 +455,6 @@ endif()
 		test.capture [[
 # target_include_directories
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_include_directories("MyProject" SYSTEM PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
 		)
@@ -643,9 +488,6 @@ endif()
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_definitions("MyProject" PRIVATE "DEFINE")
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_compile_definitions("MyProject" PRIVATE "DEFINE")
-endif()
 		]]
 	end
 
@@ -659,15 +501,6 @@ endif()
 		test.capture [[
 # target_compile_definitions
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_definitions("MyProject" PRIVATE "DEFINE")
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_definitions("MyProject" PRIVATE "DEFINE")
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_definitions("MyProject" PRIVATE "DEFINE")
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_definitions("MyProject" PRIVATE "DEFINE")
 endif()
 		]]
@@ -687,20 +520,15 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"DEFINE2"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_compile_definitions("MyProject" PRIVATE
-		"DEFINE1"
-		"DEFINE2"
-		)
-endif()
 		]]
 	end
 
 	function suite.OnProjectCMakeListsTxt_target_compile_definitions_OnDefinesFilterBuildcfg()
 		project 'MyProject'
 		kind 'WindowedApp'
-		filter 'configurations:Release'
-		defines { 'NDEBUG' }
+		filter 'configurations:Release' do
+			defines { 'NDEBUG' }
+		end filter {}
 		prepare()
 		androidstudio.target_compile_definitions(prj1)
 		test.capture [[
@@ -733,13 +561,7 @@ endif()
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	set_target_properties("MyProject" PROPERTIES
 		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Debug"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Release"
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
 		)
 endif()
 		]]
@@ -756,25 +578,7 @@ endif()
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
 		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Debug"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Debug"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Release"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Release"
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		)
 endif()
 		]]
@@ -789,12 +593,7 @@ endif()
 # set_target_properties
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Debug"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Release"
+		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
 		)
 endif()
 		]]
@@ -810,22 +609,7 @@ endif()
 # set_target_properties
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Debug"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Debug"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Release"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Release"
+		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		)
 endif()
 		]]
@@ -840,12 +624,7 @@ endif()
 # set_target_properties
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Debug"
-		)
-endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/Release"
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
 		)
 endif()
 		]]
@@ -861,22 +640,7 @@ endif()
 # set_target_properties
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Debug"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Debug"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM/Release"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/bin/ARM64/Release"
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		)
 endif()
 		]]
@@ -907,11 +671,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"-include" "file.h"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
-		)
-endif()
 		]]
 	end
 
@@ -925,21 +684,6 @@ endif()
 		test.capture [[
 # target_compile_options
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"-include" "file.h"
 		)
@@ -960,11 +704,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"buildoption"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_compile_options("MyProject" PRIVATE
-		"buildoption"
-		)
-endif()
 		]]
 	end
 
@@ -978,21 +717,6 @@ endif()
 		test.capture [[
 # target_compile_options
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"buildoption"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"buildoption"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"buildoption"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"buildoption"
 		)
@@ -1025,11 +749,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
-		)
-endif()
 		]]
 	end
 
@@ -1043,21 +762,6 @@ endif()
 		test.capture [[
 # target_link_directories
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
 		)
@@ -1078,11 +782,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
-		)
-endif()
 		]]
 	end
 
@@ -1096,21 +795,6 @@ endif()
 		test.capture [[
 # target_link_directories
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
-		)
-endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
 		)
@@ -1145,13 +829,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		"-Wl,--end-group"
 		)
 endif()
-if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_link_libraries("MyProject" PRIVATE
-		"-Wl,--start-group"
-		"link"
-		"-Wl,--end-group"
-		)
-endif()
 		]]
 	end
 
@@ -1171,27 +848,6 @@ if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 		"-Wl,--end-group"
 		)
 endif()
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-Wl,--start-group"
-		"link"
-		"-Wl,--end-group"
-		)
-endif()
-if("Release|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-Wl,--start-group"
-		"link"
-		"-Wl,--end-group"
-		)
-endif()
-if("Release|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_link_libraries("MyProject" PRIVATE
-		"-Wl,--start-group"
-		"link"
-		"-Wl,--end-group"
-		)
-endif()
 		]]
 	end
 
@@ -1201,5 +857,97 @@ endif()
 		prepare()
 		androidstudio.add_custom_command(prj1)
 		test.capture [[
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommands()
+		project 'MyProject'
+		kind 'WindowedApp'
+		files { 'input.txt', }
+		filter { 'files:input.txt' } do
+			buildcommands {
+				'cp -rf input.txt output.txt',
+			}
+			buildmessage 'input -> output'
+			buildinputs {
+			}
+			buildoutputs {
+				'output.txt',
+			}
+		end filter {}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# input -> output
+	add_custom_target("MyProjectDebugBuildcommand1"
+		COMMAND
+			cp -rf input.txt output.txt
+		BYPRODUCTS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		COMMENT "input -> output"
+		SOURCES
+			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
+		)
+	add_dependencies("MyProject" "MyProjectDebugBuildcommand1")
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommands2()
+		project 'MyProject'
+		kind 'WindowedApp'
+		files { 'input.txt', 'intermidiate.txt', }
+		filter { 'files:input.txt' } do
+			buildcommands {
+				'cp -rf input.txt intermidiate.txt',
+			}
+			buildmessage 'input -> intermidiate'
+			buildinputs {
+			}
+			buildoutputs {
+				'intermidiate.txt',
+			}
+		end filter {}
+		filter { 'files:intermidiate.txt' } do
+			buildcommands {
+				'cp -rf intermidiate.txt output.txt',
+			}
+			buildmessage 'intermidiate -> output'
+			buildinputs {
+			}
+			buildoutputs {
+				'output.txt',
+			}
+		end filter {}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# intermidiate -> output
+	add_custom_target("MyProjectDebugBuildcommand2"
+		COMMAND
+			cp -rf intermidiate.txt output.txt
+		BYPRODUCTS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		COMMENT "intermidiate -> output"
+		SOURCES
+			"${PREMAKE_MAIN_SCRIPT_DIR}/intermidiate.txt"
+		)
+	add_dependencies("MyProject" "MyProjectDebugBuildcommand2")
+	# input -> intermidiate
+	add_custom_target("MyProjectDebugBuildcommand1"
+		COMMAND
+			cp -rf input.txt intermidiate.txt
+		BYPRODUCTS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/intermidiate.txt"
+		COMMENT "input -> intermidiate"
+		SOURCES
+			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
+		)
+	add_dependencies("MyProjectDebugBuildcommand2" "MyProjectDebugBuildcommand1")
+endif()
 		]]
 	end

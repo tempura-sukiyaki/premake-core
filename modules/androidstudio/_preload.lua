@@ -68,7 +68,7 @@
 			if #table.keys(wks.localproperties) > 0 then
 				p.generate(wks, "local.properties", p.modules.androidstudio.generate_workspace_localproperties)
 			end
-			p.generate(wks, "settings.gradle", p.modules.androidstudio.geneate_workspace_settingsgradle)
+			p.generate(wks, "settings.gradle", p.modules.androidstudio.generate_workspace_settingsgradle)
 		end,
 
 		onProject = function(prj)

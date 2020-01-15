@@ -16,7 +16,7 @@
 	local cmake = m.cmake
 
 	cmake.minimum_required = { 3, 6, 4 }
-	cmake.buildcommands_as_add_custom_command = true
+	cmake.buildcommands_as_add_custom_command = false
 
 
 	function cmake.getlanguages(str)
@@ -616,12 +616,15 @@
 			end
 		end
 
-		_p(0, '# add_custom_command')
+		_p(0, iif(m.cmake.buildcommands_as_add_custom_command, '# add_custom_command', '# add_custom_target'))
 		for cfg in project.eachconfig(prj) do
 			if #buildcommands[cfg] > 0 then
 				_x(0, ifcondition(cfg))
-				for i, info in ipairs(buildcommands[cfg]) do
-					local buildcommandname = cmake.quoted(prj.name .. cfg.buildcfg .. 'Buildcommand' .. i)
+				local prevname = cmake.quoted(prj.name)
+				for i = #buildcommands[cfg], 1, -1 do
+					local info = buildcommands[cfg][i]
+					local name = cmake.quoted(prj.name .. cfg.buildcfg .. 'Buildcommand' .. i)
+					_p(1, '# %s', info.message)
 					if m.cmake.buildcommands_as_add_custom_command then
 						_p(1, 'add_custom_command(')
 						_p(2, 'OUTPUT')
@@ -629,7 +632,7 @@
 							_x(3, '%s', cmake.quoted(cmake.getpath(file)))
 						end)
 					else
-						_x(1, 'add_custom_target(%s', buildcommandname)
+						_x(1, 'add_custom_target(%s', name)
 					end
 					table.foreachi(info.commands, function(command)
 						_p(2, 'COMMAND')
@@ -653,15 +656,9 @@
 						_x(3, '%s', cmake.quoted(cmake.getpath(file)))
 					end)
 					_p(2, ')')
-					p.outln('')
 					if not m.cmake.buildcommands_as_add_custom_command then
-						if 1 < i then
-							local depends = prj.name .. cfg.buildcfg .. 'Buildcommand' .. (i - 1)
-							_x(1, 'add_dependencies(%s %s)', buildcommandname, cmake.quoted(depends))
-						elseif #buildcommands[cfg] == i then
-							_x(1, 'add_dependencies(%s %s)', cmake.quoted(prj.name), buildcommandname)
-						end
-						p.outln('')
+						_x(1, 'add_dependencies(%s %s)', prevname, name)
+						prevname = name
 					end
 				end
 				_p(0, 'endif()')

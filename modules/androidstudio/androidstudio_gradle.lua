@@ -243,7 +243,9 @@
 				['android.externalNativeBuild.cmake.path'] = 'CMakeLists.txt',
 			}, prj.projectbuildgradle)
 			for key, value in pairs(tbl) do
-				buildgradle[split_index(key)] = value
+				local indices1 = split_index(key)
+				local indices2, _ = get_indices_and_value(buildgradle, indices1)
+				buildgradle[indices2 or indices1] = value
 			end
 		end
 
@@ -257,7 +259,6 @@
 				end,
 				value,
 			}))
-			table.sort(value)
 			buildgradle[key or indices] = value
 		end
 
@@ -288,7 +289,6 @@
 					'-DPREMAKE_CONFIG_BUILDCFG=' .. cfg.buildcfg,
 					value,
 				}))
-				table.sort(value)
 				buildgradle[key or indices] = value
 			end
 
@@ -310,7 +310,6 @@
 						'-DPREMAKE_CONFIG_PLATFORM=' .. cfg.platform,
 						value,
 					}))
-					table.sort(value)
 					buildgradle[key or indices] = value
 				end
 
@@ -346,7 +345,9 @@
 				['buildscript.repositories.jcenter()'] = {},
 			}, wks.workspacebuildgradle)
 			for key, value in pairs(tbl) do
-				buildgradle[split_index(key)] = value
+				local indices1 = split_index(key)
+				local indices2, _ = get_indices_and_value(buildgradle, indices1)
+				buildgradle[indices2 or indices1] = value
 			end
 		end
 
@@ -379,7 +380,7 @@
 	end
 
 
-	function m.geneate_workspace_settingsgradle(wks)
+	function m.generate_workspace_settingsgradle(wks)
 		for prj in p.workspace.eachproject(wks) do
 			if prj.kind == p.WINDOWEDAPP then
 				local name = quoted(':' .. prj.name, true)

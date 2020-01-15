@@ -3,7 +3,6 @@
 -- Automated test suite for Android Studio project generation.
 ---
 
-
 	local suite = test.declare("androidstudio_properties")
 	local p = premake
 	local androidstudio = p.modules.androidstudio
@@ -12,7 +11,7 @@
 -- Setup/Teardown
 ---------------------------------------------------------------------------
 
-	local wks, prj
+	local wks
 
 	function suite.setup()
 		_TARGET_OS = 'android'
@@ -23,29 +22,60 @@
 		wks = test.createWorkspace()
 	end
 
-	local function prepare()
+	local function prepare_gradleproperties()
 		androidstudio.generate_workspace_gradleproperties(wks)
-		--prj = test.getproject(wks, 1)
 	end
 
 --
 --
 --
 
-	function suite.OnGradleProperty_Empty()
-		prepare()
+	function suite.OnWorkspaceGradleProperties()
+		prepare_gradleproperties()
 		test.capture [[
-
 		]]
 	end
 
-	function suite.OnGradleProperty_NotEmpty()
+	function suite.OnWorkspaceGradleProperties_org_gradle_parallel_boolean()
+		project '*'
 		gradleproperties {
 			['org.gradle.parallel'] = true,
 		}
-		prepare()
+		prepare_gradleproperties()
 		test.capture [[
-'qqqqqq'
+org.gradle.parallel=true
 		]]
 	end
 
+	function suite.OnWorkspaceGradleProperties_org_gradle_parallel_number()
+		project '*'
+		gradleproperties {
+			['org.gradle.parallel'] = 1,
+		}
+		prepare_gradleproperties()
+		test.capture [[
+org.gradle.parallel=1
+		]]
+	end
+
+	function suite.OnWorkspaceGradleProperties_org_gradle_parallel_string()
+		project '*'
+		gradleproperties {
+			['org.gradle.parallel'] = 'true',
+		}
+		prepare_gradleproperties()
+		test.capture [[
+org.gradle.parallel=true
+		]]
+	end
+
+	function suite.OnWorkspaceGradleProperties_org_gradle_parallel_function()
+		project '*'
+		gradleproperties {
+			['org.gradle.parallel'] = function () return 'true' end,
+		}
+		prepare_gradleproperties()
+		test.capture [[
+org.gradle.parallel=true
+		]]
+	end
