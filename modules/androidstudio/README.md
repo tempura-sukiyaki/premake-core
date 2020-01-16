@@ -8,7 +8,7 @@ Premake extension to support the [Android Studio](https://developer.android.com/
 
 Simply generate your project using the `androidstudio` action:
 
-```bash
+```sh
 premake5 androidstudio
 ```
 

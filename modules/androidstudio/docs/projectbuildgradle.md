@@ -40,13 +40,13 @@ android {
   sourceSets {
     main {
       java {
-        srcDirs "othre/java"
+        srcDirs "other/java"
       }
       manifest {
-        srcFile "othre/AndroidManifest.xml"
+        srcFile "other/AndroidManifest.xml"
       }
       res {
-        srcDirs "othre/res1", "othre/res2"
+        srcDirs "other/res1", "other/res2"
       }
     }
   }
