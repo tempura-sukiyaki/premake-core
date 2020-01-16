@@ -60,8 +60,7 @@ cmake_minimum_required(VERSION 3.6.4)
 	function suite.OnProjectCMakeListsTxt_add_subdirectory()
 		prepare()
 		androidstudio.add_subdirectory(prj1)
-		test.capture [[
-		]]
+		test.isemptycapture()
 	end
 
 	function suite.OnProjectCMakeListsTxt_add_subdirectory_OnDependson()
@@ -316,8 +315,7 @@ add_custom_target("MyProject")
 	function suite.OnProjectCMakeListsTxt_add_dependencies()
 		prepare()
 		androidstudio.add_dependencies(prj1)
-		test.capture [[
-		]]
+		test.isemptycapture()
 	end
 
 	function suite.OnProjectCMakeListsTxt_add_dependencies_OnDependson()
@@ -646,6 +644,41 @@ endif()
 		]]
 	end
 
+	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedAppVectorExtensionsARM()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM' }
+		vectorextensions 'NEON'
+		prepare()
+		androidstudio.set_target_properties(prj1)
+		test.capture [[
+# set_target_properties
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	set_target_properties("MyProject" PROPERTIES
+		COMPILE_FLAGS "-mfpu=neon"
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedAppVectorExtensionsARM64()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM64' }
+		vectorextensions 'NEON'
+		prepare()
+		androidstudio.set_target_properties(prj1)
+		test.capture [[
+# set_target_properties
+if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM64/Debug"
+		)
+endif()
+		]]
+	end
+
 	-- target_compile_options
 
 	function suite.OnProjectCMakeListsTxt_target_compile_options()
@@ -686,6 +719,105 @@ endif()
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"-include" "file.h"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnDisablearnings()
+		project 'MyProject'
+		kind 'WindowedApp'
+		disablewarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	target_compile_options("MyProject" PRIVATE
+		"-Wno-warning"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnDisablewarningsPlatforms()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM', 'ARM64' }
+		disablewarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	target_compile_options("MyProject" PRIVATE
+		"-Wno-warning"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnEnablearnings()
+		project 'MyProject'
+		kind 'WindowedApp'
+		enablewarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	target_compile_options("MyProject" PRIVATE
+		"-Wwarning"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnEnablewarningsPlatforms()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM', 'ARM64' }
+		enablewarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	target_compile_options("MyProject" PRIVATE
+		"-Wwarning"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnFagalwarnings()
+		project 'MyProject'
+		kind 'WindowedApp'
+		fatalwarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	target_compile_options("MyProject" PRIVATE
+		"-Werror=warning"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_target_compile_options_OnFatalwarningsPlatforms()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM', 'ARM64' }
+		fatalwarnings { 'warning' }
+		prepare()
+		androidstudio.target_compile_options(prj1)
+		test.capture [[
+# target_compile_options
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	target_compile_options("MyProject" PRIVATE
+		"-Werror=warning"
 		)
 endif()
 		]]
@@ -853,13 +985,6 @@ endif()
 
 	-- add_custom_command
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command()
-		prepare()
-		androidstudio.add_custom_command(prj1)
-		test.capture [[
-		]]
-	end
-
 	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommands()
 		project 'MyProject'
 		kind 'WindowedApp'
@@ -880,6 +1005,42 @@ endif()
 		test.capture [[
 # add_custom_target
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# input -> output
+	add_custom_target("MyProjectDebugBuildcommand1"
+		COMMAND
+			cp -rf input.txt output.txt
+		BYPRODUCTS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		COMMENT "input -> output"
+		SOURCES
+			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
+		)
+	add_dependencies("MyProject" "MyProjectDebugBuildcommand1")
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommandsPlatforms()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM', 'ARM64' }
+		files { 'input.txt', }
+		filter { 'files:input.txt' } do
+			buildcommands {
+				'cp -rf input.txt output.txt',
+			}
+			buildmessage 'input -> output'
+			buildinputs {
+			}
+			buildoutputs {
+				'output.txt',
+			}
+		end filter {}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	# input -> output
 	add_custom_target("MyProjectDebugBuildcommand1"
 		COMMAND
@@ -951,3 +1112,85 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 endif()
 		]]
 	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPrebuildcommands()
+		project 'MyProject'
+		kind 'WindowedApp'
+		prebuildcommands {
+			'cp -rf input.txt output.txt',
+		}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+
+# add_custom_command
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# PRE_BUILD
+	add_custom_command(
+		TARGET "MyProject"
+		PRE_BUILD
+		COMMAND
+			cp -rf input.txt output.txt
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		VERBATIM
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPrelinkcommands()
+		project 'MyProject'
+		kind 'WindowedApp'
+		prelinkcommands {
+			'cp -rf input.txt output.txt',
+		}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+
+# add_custom_command
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# PRE_LINK
+	add_custom_command(
+		TARGET "MyProject"
+		PRE_LINK
+		COMMAND
+			cp -rf input.txt output.txt
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		VERBATIM
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPostbuildcommands()
+		project 'MyProject'
+		kind 'WindowedApp'
+		postbuildcommands {
+			'cp -rf input.txt output.txt',
+		}
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+
+# add_custom_command
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# POST_BUILD
+	add_custom_command(
+		TARGET "MyProject"
+		POST_BUILD
+		COMMAND
+			cp -rf input.txt output.txt
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		VERBATIM
+		)
+endif()
+		]]
+	end
+

@@ -101,7 +101,7 @@
 			return '-Wno-' .. opt
 		end)
 		local fatalwarnings = table.translate(cfg.fatalwarnings, function(opt)
-			return '-Werror-' .. opt
+			return '-Werror=' .. opt
 		end)
 		return table.join(enablewarnings, disablewarnings, fatalwarnings)
 	end
@@ -170,16 +170,29 @@
 			[p.ON] = '-funsigned-char',
 			[p.OFF] = '-fno-unsigned-char'
 		},
-		vectorextensions = {
-			['AVX'] = '-mavx',
-			['AVX2'] = '-mavx2',
-			['SSE'] = '-msse',
-			['SSE2'] = '-msse2',
-			['SSE3'] = '-msse3',
-			['SSSE3'] = '-mssse3',
-			['SSE4.1'] = '-msse4.1',
-			['NEON'] = '-mfpu=neon',
-		},
+		vectorextensions = function (cfg, mappings)
+			if cfg.architecture == p.ARM then
+				return {
+					['NEON'] = '-mfpu=neon',
+				}
+			elseif cfg.architecture == p.ARM64 then
+				return {}
+			elseif cfg.architecture == p.X86 or cfg.architecture == p.X86_64 then
+				return {
+					['AVX'] = '-mavx',
+					['AVX2'] = '-mavx2',
+					['SSE'] = '-msse',
+					['SSE2'] = '-msse2',
+					['SSE3'] = '-msse3',
+					['SSSE3'] = '-mssse3',
+					['SSE4.1'] = '-msse4.1',
+				}
+			else
+				return {
+					['NEON'] = '-mfpu=neon',
+				}
+			end
+		end,
 		warnings = {
 			Extra = {'-Wall', '-Wextra'},
 			High = '-Wall',
@@ -187,7 +200,6 @@
 		},
 		-- cxx
 		exceptionhandling = {
-			[p.ON] = '-fexceptions',
 			[p.OFF] = '-fno-exceptions',
 		},
 		flags = {
@@ -197,7 +209,6 @@
 			Hidden = '-fvisibility-inlines-hidden',
 		},
 		rtti = {
-			[p.ON] = '-frtti',
 			[p.OFF] = '-fno-rtti',
 		},
 		visibility = {
@@ -220,7 +231,6 @@
 		if #deps > 0 then
 			_p(0, '# add_subdirectory')
 			table.foreachi(deps, function(dep)
-				p.warn(dep.location)
 				_x(0, 'if(NOT TARGET %s)', cmake.quoted(dep.name))
 				_p(1, 'add_subdirectory(')
 				_p(2, cmake.quoted(cmake.getpath(dep.location)))
@@ -257,7 +267,7 @@
 		if cmakekind then
 			_p(0, '# add_library')
 			for cfg in project.eachconfig(prj) do
-				_x(0, ifcondition(cfg))
+				_p(0, ifcondition(cfg))
 				_x(1, 'add_library(%s %s', cmake.quoted(prj.name), cmakekind)
 				local options = table.translate(cfg.files, function(opt)
 					local extensions = cmake.getextensions(prj.language)
@@ -314,7 +324,7 @@
 					return cmake.quoted(cmake.getpath(opt))
 				end)
 				if #sysincludedirs > 0 or #includedirs > 0 then
-					_x(0, ifcondition(cfg))
+					_p(0, ifcondition(cfg))
 					if #sysincludedirs > 0 then
 						_x(1, 'target_include_directories(%s SYSTEM PRIVATE', cmake.quoted(prj.name))
 						table.sort(sysincludedirs)
@@ -348,7 +358,7 @@
 					return cmake.quoted(opt)
 				end)
 				if #options > 0 then
-					_x(0, ifcondition(cfg))
+					_p(0, ifcondition(cfg))
 					if #options == 1 then
 						_x(1, 'target_compile_definitions(%s PRIVATE %s)', cmake.quoted(prj.name), options[1])
 					else
@@ -399,12 +409,11 @@
 					end
 				end
 				local flags = table.translate(config.mapFlags(cfg, cmake.compileflags), cmake.quoted)
-				local warnings = table.translate(cmake.warnings(cfg), cmake.quoted)
 
 				local keys = table.keys(tbl)
-				local options = table.join(flags, warnings)
+				local options = table.join(flags)
 				if #keys > 0 or #options > 0 then
-					_x(0, ifcondition(cfg))
+					_p(0, ifcondition(cfg))
 					_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
 					table.sort(options)
 					local outoption = false
@@ -435,10 +444,11 @@
 				local forceincludes = table.translate(cfg.forceincludes, function(opt)
 					return '"-include" ' .. cmake.quoted(project.getrelative(prj, opt))
 				end)
+				local warnings = table.translate(cmake.warnings(cfg), cmake.quoted)
 				local buildoptions = table.translate(cfg.buildoptions, cmake.quoted)
-				local options = table.join(forceincludes, buildoptions)
+				local options = table.join(forceincludes, warnings, buildoptions)
 				if #options > 0 then
-					_x(0, ifcondition(cfg))
+					_p(0, ifcondition(cfg))
 					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
 					table.sort(options)
 					for _, opt in ipairs(options) do
@@ -471,7 +481,7 @@
 					end)
 					local options = table.join(libdirs)
 					if #options > 0 then
-						_x(0, ifcondition(cfg))
+						_p(0, ifcondition(cfg))
 						_x(1, 'target_link_directories(%s PRIVATE', cmake.quoted(prj.name))
 						table.sort(options)
 						table.foreachi(options, function(opt)
@@ -487,7 +497,7 @@
 					end)
 					local options = table.join(libdirs)
 					if #options > 0 then
-						_x(0, ifcondition(cfg))
+						_p(0, ifcondition(cfg))
 						_x(1, 'target_link_libraries(%s PRIVATE', cmake.quoted(prj.name))
 						table.sort(options)
 						table.foreachi(options, function(opt)
@@ -530,7 +540,7 @@
 				table.sort(linkoptions)
 				local options = table.join(links, linkoptions)
 				if #options > 0 then
-					_x(0, ifcondition(cfg))
+					_p(0, ifcondition(cfg))
 					_x(1, 'target_link_libraries(%s PRIVATE', cmake.quoted(prj.name))
 					table.foreachi(options, function(opt)
 						_p(2, opt)
@@ -619,7 +629,7 @@
 		_p(0, iif(m.cmake.buildcommands_as_add_custom_command, '# add_custom_command', '# add_custom_target'))
 		for cfg in project.eachconfig(prj) do
 			if #buildcommands[cfg] > 0 then
-				_x(0, ifcondition(cfg))
+				_p(0, ifcondition(cfg))
 				local prevname = cmake.quoted(prj.name)
 				for i = #buildcommands[cfg], 1, -1 do
 					local info = buildcommands[cfg][i]
@@ -661,6 +671,47 @@
 						prevname = name
 					end
 				end
+				_p(0, 'endif()')
+			end
+		end
+
+		if not m.cmake.buildcommands_as_add_custom_command then
+			p.outln('')
+			_p(0, '# add_custom_command')
+		end
+
+		for cfg in project.eachconfig(prj) do
+			if #cfg.prebuildcommands > 0 or #cfg.prelinkcommands > 0 or #cfg.postbuildcommands > 0 then
+				_p(0, ifcondition(cfg))
+				table.foreachi({
+					{
+						commands = cfg.prebuildcommands,
+						when = 'PRE_BUILD',
+					},
+					{
+						commands = cfg.prelinkcommands,
+						when = 'PRE_LINK',
+					},
+					{
+						commands = cfg.postbuildcommands,
+						when = 'POST_BUILD',
+					},
+				}, function (tbl)
+					if #tbl.commands > 0 then
+						_x(1, '# %s', tbl.when)
+						_p(1, 'add_custom_command(')
+						_x(2, 'TARGET %s', cmake.quoted(prj.name))
+						_p(2, tbl.when)
+						table.foreachi(tbl.commands, function(command)
+							_p(2, 'COMMAND')
+							_x(3, '%s', command)
+						end)
+						_p(2, 'WORKING_DIRECTORY')
+						_p(3, cmake.quoted(cmake.getpath(prj.location)))
+						_p(2, 'VERBATIM')
+						_p(2, ')')
+					end
+				end)
 				_p(0, 'endif()')
 			end
 		end
