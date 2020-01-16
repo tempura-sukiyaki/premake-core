@@ -4,7 +4,7 @@ localproperties
 
 ```Lua
 localproperties {
-  ['sdk.dir'] = '/Users/tempura.sukiyaki/Library/Android/sdk'
+  ['sdk.dir'] = '/Users/foo/Library/Android/sdk'
 }
 ```
 
