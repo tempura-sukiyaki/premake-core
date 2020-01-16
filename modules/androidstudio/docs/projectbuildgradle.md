@@ -27,9 +27,13 @@ Premake 5.0.0 alpha 15 or later.
 
 ```Lua
 projectbuildgradle {
+  ['android.buildTypes.release.minifyEnabled'] = true,
   ['android.sourceSets.main.java.srcDirs'] = 'other/java',
   ['android.sourceSets.main.res.srcDirs'] = { 'other/res1', 'other/res2' },
   ['android.sourceSets.main.manifest.srcFile'] = 'other/AndroidManifest.xml',
+  -- Keys you don't want to escape
+  -- Values you want to empty
+  ['dependencies.%(implementation project(":mylibrary"))'] = {},
 }
 ```
 
@@ -37,6 +41,11 @@ will generate:
 
 ```groovy
 android {
+  buildTypes {
+    release {
+      minifyEnabled true
+    }
+  }
   sourceSets {
     main {
       java {
@@ -51,4 +60,12 @@ android {
     }
   }
 }
+
+dependencies {
+  implementation project(":mylibrary")
+}
 ```
+
+### See Also ###
+
+* [workspacebuildgradle](workspacebuildgradle.md)
