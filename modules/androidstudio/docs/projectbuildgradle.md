@@ -28,6 +28,10 @@ Premake 5.0.0 alpha 15 or later.
 ```Lua
 projectbuildgradle {
   ['android.buildTypes.release.minifyEnabled'] = true,
+  -- Values you don't want to escape
+  ['android.buildTypes.release.proguardFiles'] = function ()
+    return 'getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"'
+  end,
   ['android.sourceSets.main.java.srcDirs'] = 'other/java',
   ['android.sourceSets.main.res.srcDirs'] = { 'other/res1', 'other/res2' },
   ['android.sourceSets.main.manifest.srcFile'] = 'other/AndroidManifest.xml',
@@ -44,6 +48,7 @@ android {
   buildTypes {
     release {
       minifyEnabled true
+      proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
     }
   }
   sourceSets {
