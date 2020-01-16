@@ -118,11 +118,17 @@
 			ShadowedVariables = '-Wshadow',
 			UndefinedIdentifiers = '-Wundef',
 		},
-		floatabi = {
-			soft   = '-mfloat-abi=soft',
-			softfp = '-mfloat-abi=softfp',
-			hard   = '-mfloat-abi=hard',
-		},
+		floatabi = function (cfg, mappings)
+			if not cfg.architecture or cfg.architecture == p.ARM then
+				return {
+					soft = '-mfloat-abi=soft',
+					softfp = '-mfloat-abi=softfp',
+					hard = '-mfloat-abi=hard',
+				}
+			else
+				return {}
+			end
+		end,
 		floatingpoint = {
 			Fast = '-ffast-math',
 			Strict = '-ffloat-store',
@@ -171,7 +177,7 @@
 			[p.OFF] = '-fno-unsigned-char'
 		},
 		vectorextensions = function (cfg, mappings)
-			if cfg.architecture == p.ARM then
+			if not cfg.architecture or cfg.architecture == p.ARM then
 				return {
 					['NEON'] = '-mfpu=neon',
 				}
@@ -186,10 +192,6 @@
 					['SSE3'] = '-msse3',
 					['SSSE3'] = '-mssse3',
 					['SSE4.1'] = '-msse4.1',
-				}
-			else
-				return {
-					['NEON'] = '-mfpu=neon',
 				}
 			end
 		end,
