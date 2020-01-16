@@ -16,7 +16,7 @@ and open the generated project directory in Android Studio.
 
 ### APIs ###
 
-* gradleproperties
-* localproperties
-* projectbuildgradle
-* workspacebuildgradle
+* [gradleproperties](docs/gradleproperties.md)
+* [localproperties](docs/localproperties.md)
+* [projectbuildgradle](docs/projectbuildgradle.md)
+* [workspacebuildgradle](docs/workspacebuildgradle.md)
