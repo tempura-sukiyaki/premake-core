@@ -179,7 +179,7 @@
 				for i = 1, #value do
 					table.insert(result, stringify(value[i]))
 				end
-				table.sort(result)
+				-- table.sort(result)
 				return table.concat(result, ', ')
 			end
 			p.error('invalid gradle value type: %s', type(value))
@@ -338,11 +338,11 @@
 		do
 			local tbl = table.merge({
 				-- allproject
-				['allprojects.repositories.google()'] = {},
-				['allprojects.repositories.jcenter()'] = {},
+				['allprojects.repositories.%(/* 4000 */ google())'] = {},
+				['allprojects.repositories.%(/* 6000 */ jcenter())'] = {},
 				-- buildscript
-				['buildscript.repositories.google()'] = {},
-				['buildscript.repositories.jcenter()'] = {},
+				['buildscript.repositories.%(/* 4000 */ google())'] = {},
+				['buildscript.repositories.%(/* 6000 */ jcenter())'] = {},
 			}, wks.workspacebuildgradle)
 			for key, value in pairs(tbl) do
 				local indices1 = split_index(key)

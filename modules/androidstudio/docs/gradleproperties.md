@@ -18,7 +18,7 @@ The `workspace` scope.
 
 ### Availability ###
 
-Premake 5.0.0 alpha 15 or later.
+Premake 5.0.0 alpha 15? or later.
 
 ### Examples ###
 

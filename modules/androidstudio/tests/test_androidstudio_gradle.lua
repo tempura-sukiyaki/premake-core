@@ -69,8 +69,8 @@ project(":MyProject").setProjectDir(file("MyProject"))
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -79,8 +79,8 @@ buildscript {
 		classpath "com.android.tools.build:gradle:3.5.2"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 		]]
@@ -95,8 +95,8 @@ buildscript {
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -105,8 +105,8 @@ buildscript {
 		classpath "com.android.tools.build:gradle:3.5.1"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 		]]
@@ -121,8 +121,8 @@ buildscript {
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -132,8 +132,8 @@ buildscript {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 		]]
@@ -150,8 +150,8 @@ buildscript {
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -160,8 +160,8 @@ buildscript {
 		classpath "com.android.tools.build:gradle:3.5.2"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -184,8 +184,8 @@ ext {
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -194,8 +194,8 @@ buildscript {
 		classpath "com.android.tools.build:gradle:3.5.2"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -218,8 +218,8 @@ ext {
 		test.capture [[
 allprojects {
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -228,8 +228,8 @@ buildscript {
 		classpath "com.android.tools.build:gradle:3.5.2"
 	}
 	repositories {
-		google()
-		jcenter()
+		/* 4000 */ google()
+		/* 6000 */ jcenter()
 	}
 }
 
@@ -238,7 +238,7 @@ ext {
 	function = (1 + 1)
 	number = 42
 	string = "string"
-	table = "string", (1 + 1), 42, true
+	table = true, (1 + 1), 42, "string"
 }
 		]]
 	end
@@ -333,7 +333,7 @@ android {
 			debuggable false
 			externalNativeBuild {
 				cmake {
-					arguments "-DDEFINE", "-DPREMAKE_CONFIG_BUILDCFG=Debug"
+					arguments "-DPREMAKE_CONFIG_BUILDCFG=Debug", "-DDEFINE"
 		]]
 	end
 
@@ -355,7 +355,7 @@ android {
 			debuggable false
 			externalNativeBuild {
 				cmake {
-					arguments "-DDEFINE1", "-DDEFINE2", "-DPREMAKE_CONFIG_BUILDCFG=Debug"
+					arguments "-DPREMAKE_CONFIG_BUILDCFG=Debug", "-DDEFINE1", "-DDEFINE2"
 		]]
 	end
 
@@ -391,7 +391,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DDEFINE", "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE"
 		]]
 	end
 
@@ -430,7 +430,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DDEFINE1", "-DDEFINE2", "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE1", "-DDEFINE2"
 		]]
 	end
 
