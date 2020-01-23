@@ -393,9 +393,9 @@
 				--else
 				--	tbl['ANDROID_PROCESS_MAX'] = '1'
 				--end
-				if cmakekind == 'STATIC' then
+				if prj.kind == p.STATICLIB then
 					tbl['ARCHIVE_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
-				elseif cmakekind == 'SHARED' then
+				elseif prj.kind == p.SHAREDLIB then
 					tbl['LIBRARY_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
 				end
 				do
@@ -411,24 +411,29 @@
 					end
 				end
 				local flags = table.translate(config.mapFlags(cfg, cmake.compileflags), cmake.quoted)
-
 				local keys = table.keys(tbl)
 				local options = table.join(flags)
+				local function outoptions()
+					table.foreachi(options, function(opt)
+						_x(2, 'COMPILE_FLAGS %s', opt)
+					end)
+					return true
+				end
 				if #keys > 0 or #options > 0 then
 					_p(0, ifcondition(cfg))
 					_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
 					table.sort(options)
-					local outoption = false
+					local isout = false
 					for key, value in spairs(tbl) do
-						if not outoption and key > 'COMPILE_FLAGS' then
-							table.foreachi(options, function(opt)
-								_x(2, 'COMPILE_FLAGS %s', opt)
-							end)
-							outoption = true
+						if not isout and key > 'COMPILE_FLAGS' then
+							isout = outoptions()
 						end
 						_x(2, '%s %s', key, value)
 					end
-					_p(2, ')')
+					if not isout then
+						outoptions()
+					end
+				_p(2, ')')
 					_p(0, 'endif()')
 				end
 			end

@@ -620,11 +620,7 @@ endif()
 		androidstudio.set_target_properties(prj1)
 		test.capture [[
 # set_target_properties
-if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
-		)
-endif()
+
 		]]
 	end
 
@@ -636,11 +632,7 @@ endif()
 		androidstudio.set_target_properties(prj1)
 		test.capture [[
 # set_target_properties
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
-		)
-endif()
+
 		]]
 	end
 
@@ -656,7 +648,6 @@ endif()
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
 		COMPILE_FLAGS "-mfpu=neon"
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		)
 endif()
 		]]
@@ -671,11 +662,7 @@ endif()
 		androidstudio.set_target_properties(prj1)
 		test.capture [[
 # set_target_properties
-if("Debug|ARM64" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM64/Debug"
-		)
-endif()
+
 		]]
 	end
 
