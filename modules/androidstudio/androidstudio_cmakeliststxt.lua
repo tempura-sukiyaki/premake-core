@@ -447,7 +447,6 @@
 		if cmakekind then
 			_p(0, '# target_compile_options')
 			for cfg in project.eachconfig(prj) do
-				local forceincludes = {}
 				local forceincludes = table.translate(cfg.forceincludes, function(opt)
 					return '"-include" ' .. cmake.quoted(project.getrelative(prj, opt))
 				end)
@@ -715,7 +714,6 @@
 						end)
 						_p(2, 'WORKING_DIRECTORY')
 						_p(3, cmake.quoted(cmake.getpath(prj.location)))
-						_p(2, 'VERBATIM')
 						_p(2, ')')
 					end
 				end)

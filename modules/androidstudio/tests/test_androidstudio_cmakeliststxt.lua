@@ -1121,7 +1121,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf input.txt output.txt
 		WORKING_DIRECTORY
 			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
-		VERBATIM
 		)
 endif()
 		]]
@@ -1148,7 +1147,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf input.txt output.txt
 		WORKING_DIRECTORY
 			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
-		VERBATIM
 		)
 endif()
 		]]
@@ -1175,7 +1173,6 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf input.txt output.txt
 		WORKING_DIRECTORY
 			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
-		VERBATIM
 		)
 endif()
 		]]
