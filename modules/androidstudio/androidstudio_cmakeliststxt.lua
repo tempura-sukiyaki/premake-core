@@ -652,7 +652,7 @@
 					end
 					table.foreachi(info.commands, function(command)
 						_p(2, 'COMMAND')
-						_x(3, '%s', command)
+						_x(3, '%s', string.gsub(command, '[\\\"()]', '\\%1'))
 					end)
 					if not m.cmake.buildcommands_as_add_custom_command then
 						_p(2, 'BYPRODUCTS')
@@ -710,7 +710,7 @@
 						_p(2, tbl.when)
 						table.foreachi(tbl.commands, function(command)
 							_p(2, 'COMMAND')
-							_x(3, '%s', command)
+							_x(3, '%s', string.gsub(command, '[\\\"()]', '\\%1'))
 						end)
 						_p(2, 'WORKING_DIRECTORY')
 						_p(3, cmake.quoted(cmake.getpath(prj.location)))
