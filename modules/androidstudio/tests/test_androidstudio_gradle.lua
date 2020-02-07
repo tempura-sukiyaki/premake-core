@@ -273,7 +273,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
 			}
 		}
 		minSdkVersion 14
@@ -391,7 +391,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release", "-DDEFINE"
 		]]
 	end
 
@@ -430,7 +430,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE1", "-DDEFINE2"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release", "-DDEFINE1", "-DDEFINE2"
 		]]
 	end
 
@@ -464,7 +464,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
 			}
 		}
 		minSdkVersion 14
@@ -561,7 +561,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
 			}
 		}
 		minSdkVersion 14

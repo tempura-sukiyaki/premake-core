@@ -257,6 +257,9 @@
 				function ()
 					return string.format('"-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\\\", "/")}/%s"', path.getrelative(prj.location, _MAIN_SCRIPT_DIR))
 				end,
+				function ()
+					return string.format('"-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\\\", "/")}/%s"', path.getrelative(prj.location, _PREMAKE_DIR))
+				end,
 				value,
 			}))
 			buildgradle[key or indices] = value
