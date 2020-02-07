@@ -660,6 +660,8 @@
 							_p(3, cmake.quoted(cmake.getpath(file)))
 						end)
 					end
+					_p(2, 'WORKING_DIRECTORY')
+					_p(3, cmake.quoted(cmake.getpath(prj.location)))
 					if info.message then
 						_p(2, 'COMMENT %s', cmake.quoted(info.message))
 					end

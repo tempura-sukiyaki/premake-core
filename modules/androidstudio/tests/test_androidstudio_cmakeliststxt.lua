@@ -998,6 +998,8 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf input.txt output.txt
 		BYPRODUCTS
 			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		COMMENT "input -> output"
 		SOURCES
 			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
@@ -1034,6 +1036,8 @@ if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 			cp -rf input.txt output.txt
 		BYPRODUCTS
 			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		COMMENT "input -> output"
 		SOURCES
 			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
@@ -1080,6 +1084,8 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf intermidiate.txt output.txt
 		BYPRODUCTS
 			"${PREMAKE_MAIN_SCRIPT_DIR}/output.txt"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		COMMENT "intermidiate -> output"
 		SOURCES
 			"${PREMAKE_MAIN_SCRIPT_DIR}/intermidiate.txt"
@@ -1091,6 +1097,8 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 			cp -rf input.txt intermidiate.txt
 		BYPRODUCTS
 			"${PREMAKE_MAIN_SCRIPT_DIR}/intermidiate.txt"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		COMMENT "input -> intermidiate"
 		SOURCES
 			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
