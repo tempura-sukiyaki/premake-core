@@ -1108,6 +1108,30 @@ endif()
 		]]
 	end
 
+	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPchheader()
+		project 'MyProject'
+		kind 'WindowedApp'
+		pchheader 'header.h'
+		prepare()
+		androidstudio.add_custom_command(prj1)
+		test.capture [[
+# add_custom_target
+
+# add_custom_command
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	# Generating a PCH File
+	add_custom_command(
+		TARGET "MyProject"
+		PRE_BUILD
+		COMMAND
+			gcc -x c++-header \"header.h\" -o \"header.h.pch\"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		)
+endif()
+		]]
+	end
+
 	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPrebuildcommands()
 		project 'MyProject'
 		kind 'WindowedApp'

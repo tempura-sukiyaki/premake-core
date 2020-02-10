@@ -688,25 +688,44 @@
 			_p(0, '# add_custom_command')
 		end
 
-		for cfg in project.eachconfig(prj) do
-			if #cfg.prebuildcommands > 0 or #cfg.prelinkcommands > 0 or #cfg.postbuildcommands > 0 then
+		for cfg in project.eachconfig(prj) do	
+			if (cfg.pchheader and not cfg.flags.NoPCH) or #cfg.prebuildcommands > 0 or #cfg.prelinkcommands > 0 or #cfg.postbuildcommands > 0 then
 				_p(0, ifcondition(cfg))
+
+				if cfg.pchheader and not cfg.flags.NoPCH then
+					local toolset = cfg.toolset
+					local language = string.lower(prj.language)
+					local pathname = string.gsub(cfg.pchheader, '[\\()]', '\\%1')
+					_p(1, '# Generating a PCH File')
+					_p(1, 'add_custom_command(')
+					_x(2, 'TARGET %s', cmake.quoted(prj.name))
+					_p(2, 'PRE_BUILD')
+					_p(2, 'COMMAND')
+					_x(3, '%s -x %s-header \\"%s\\" -o \\"%s.pch\\"', toolset, language, pathname, pathname)
+					_p(2, 'WORKING_DIRECTORY')
+					_p(3, cmake.quoted(cmake.getpath(prj.location)))
+					_p(2, ')')
+				end
+
 				table.foreachi({
 					{
 						commands = cfg.prebuildcommands,
+						message = cfg.prebuildmessage,
 						when = 'PRE_BUILD',
 					},
 					{
 						commands = cfg.prelinkcommands,
+						message = cfg.prelinkmessage,
 						when = 'PRE_LINK',
 					},
 					{
 						commands = cfg.postbuildcommands,
+						message = cfg.postbuildmessage,
 						when = 'POST_BUILD',
 					},
 				}, function (tbl)
 					if #tbl.commands > 0 then
-						_x(1, '# %s', tbl.when)
+						_x(1, '# %s', tbl.message or tbl.when)
 						_p(1, 'add_custom_command(')
 						_x(2, 'TARGET %s', cmake.quoted(prj.name))
 						_p(2, tbl.when)
@@ -716,6 +735,10 @@
 						end)
 						_p(2, 'WORKING_DIRECTORY')
 						_p(3, cmake.quoted(cmake.getpath(prj.location)))
+						if tbl.message then
+							_p(2, 'COMMENT')
+							_x(3, '%s', tbl.message)
+						end
 						_p(2, ')')
 					end
 				end)
