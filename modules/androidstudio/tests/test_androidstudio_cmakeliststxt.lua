@@ -1124,7 +1124,7 @@ if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 		TARGET "MyProject"
 		PRE_BUILD
 		COMMAND
-			gcc -x c++-header \"header.h\" -o \"header.h.pch\"
+			gcc  -x c++-header \"../../header.h\" -o \"../../header.h.pch\"
 		WORKING_DIRECTORY
 			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		)
