@@ -55,11 +55,11 @@ cmake_minimum_required(VERSION 3.6.4)
 		]]
 	end
 
--- add_subdirectory
+-- dependencies
 
-	function suite.OnProjectCMakeListsTxt_add_subdirectory()
+	function suite.OnProjectCMakeListsTxt_dependencies()
 		prepare()
-		androidstudio.add_subdirectory(prj1)
+		androidstudio.dependencies(prj1)
 		test.isemptycapture()
 	end
 
@@ -67,9 +67,9 @@ cmake_minimum_required(VERSION 3.6.4)
 		project 'MyProject'
 		dependson { 'MyProject2' }
 		prepare()
-		androidstudio.add_subdirectory(prj1)
+		androidstudio.dependencies(prj1)
 		test.capture [[
-# add_subdirectory
+# dependencies
 if(NOT TARGET "MyProject2")
 	add_subdirectory(
 		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
@@ -79,14 +79,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_subdirectory_OnLinks()
+	function suite.OnProjectCMakeListsTxt_dependencies_OnLinks()
 		project 'MyProject'
 		kind 'WindowedApp'
 		links { 'MyProject2' }
 		prepare()
-		androidstudio.add_subdirectory(prj1)
+		androidstudio.dependencies(prj1)
 		test.capture [[
-# add_subdirectory
+# dependencies
 if(NOT TARGET "MyProject2")
 	add_subdirectory(
 		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
@@ -119,15 +119,14 @@ project("MyProject" LANGUAGES CXX C)
 		]]
 	end
 
-	-- add_library
+	-- target
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindSharedLib()
+	function suite.OnProjectCMakeListsTxt_target_OnKindSharedLib()
 		project 'MyProject'
 		kind 'SharedLib'
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		)
@@ -135,14 +134,13 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindSharedLibFiles()
+	function suite.OnProjectCMakeListsTxt_target_OnKindSharedLibFiles()
 		project 'MyProject'
 		kind 'SharedLib'
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -151,15 +149,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindSharedLibFilesLanguageC()
+	function suite.OnProjectCMakeListsTxt_target_OnKindSharedLibFilesLanguageC()
 		project 'MyProject'
 		kind 'SharedLib'
 		language 'C'
 		files { 'file.h', 'file.hh', 'file.hpp', 'file.hxx', 'file.h++', 'file.c', 'file.cc', 'file.cpp', 'file.cxx', 'file.c++' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c"
@@ -168,36 +165,34 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindSharedLibFilesLanguageCpp()
+	function suite.OnProjectCMakeListsTxt_target_OnKindSharedLibFilesLanguageCpp()
 		project 'MyProject'
 		kind 'SharedLib'
 		language 'C++'
 		files { 'file.h', 'file.hh', 'file.hpp', 'file.hxx', 'file.h++', 'file.c', 'file.cc', 'file.cpp', 'file.cxx', 'file.c++' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c++"
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cc"
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cxx"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/file.c++"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindSharedLibFilesPlatforms()
+	function suite.OnProjectCMakeListsTxt_target_OnKindSharedLibFilesPlatforms()
 		project 'MyProject'
 		kind 'SharedLib'
 		platforms { 'ARM', 'ARM64' }
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -206,13 +201,12 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindStaticLib()
+	function suite.OnProjectCMakeListsTxt_target_OnKindStaticLib()
 		project 'MyProject'
 		kind 'StaticLib'
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" STATIC
 		)
@@ -220,14 +214,13 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindStaticLibFiles()
+	function suite.OnProjectCMakeListsTxt_target_OnKindStaticLibFiles()
 		project 'MyProject'
 		kind 'StaticLib'
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" STATIC
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -236,15 +229,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindStaticLibFilesPlatforms()
+	function suite.OnProjectCMakeListsTxt_target_OnKindStaticLibFilesPlatforms()
 		project 'MyProject'
 		kind 'StaticLib'
 		platforms { 'ARM', 'ARM64' }
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	add_library("MyProject" STATIC
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -253,13 +245,12 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindWindowedApp()
+	function suite.OnProjectCMakeListsTxt_target_OnKindWindowedApp()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		)
@@ -267,14 +258,13 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindWindowedAppFiles()
+	function suite.OnProjectCMakeListsTxt_target_OnKindWindowedAppFiles()
 		project 'MyProject'
 		kind 'WindowedApp'
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -283,15 +273,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindWindowedLibFilesPlatforms()
+	function suite.OnProjectCMakeListsTxt_target_OnKindWindowedLibFilesPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		files { 'file.cpp' }
 		prepare()
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_library
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
@@ -300,42 +289,41 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_library_OnKindUtililty()
+	function suite.OnProjectCMakeListsTxt_target_OnKindUtililty()
 		prepare()
 		kind 'Utility'
-		androidstudio.add_library(prj1)
+		androidstudio.target(prj1)
 		test.capture [[
-# add_custom_target
 add_custom_target("MyProject")
 		]]
 	end
 
-	-- add_dependencies
+	-- dependson
 
-	function suite.OnProjectCMakeListsTxt_add_dependencies()
+	function suite.OnProjectCMakeListsTxt_dependson()
 		prepare()
-		androidstudio.add_dependencies(prj1)
+		androidstudio.dependson(prj1)
 		test.isemptycapture()
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_dependencies_OnDependson()
+	function suite.OnProjectCMakeListsTxt_dependson_OnDependson()
 		project 'MyProject'
 		dependson { 'MyProject2' }
 		prepare()
-		androidstudio.add_dependencies(prj1)
+		androidstudio.dependson(prj1)
 		test.capture [[
-# add_dependencies
+# dependson
 add_dependencies("MyProject" "MyProject2")
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_dependencies_OnDependson2()
+	function suite.OnProjectCMakeListsTxt_dependson_OnDependson2()
 		project 'MyProject'
 		dependson { 'MyProject2', 'MyProject3' }
 		prepare()
-		androidstudio.add_dependencies(prj1)
+		androidstudio.dependson(prj1)
 		test.capture [[
-# add_dependencies
+# dependson
 add_dependencies("MyProject"
 	"MyProject2"
 	"MyProject3"
@@ -344,26 +332,26 @@ add_dependencies("MyProject"
 	end
 
 
-	-- target_include_directories
+	-- includedirs
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories()
+	function suite.OnProjectCMakeListsTxt_includedirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.target_include_directories(prj1)
+		androidstudio.includedirs(prj1)
 		test.capture [[
-# target_include_directories
+# includedirs
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnSysincludedirs()
+	function suite.OnProjectCMakeListsTxt_target_sysincludedirs_OnSysincludedirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		sysincludedirs { 'sysinclude' }
 		prepare()
-		androidstudio.target_include_directories(prj1)
+		androidstudio.sysincludedirs(prj1)
 		test.capture [[
-# target_include_directories
+# sysincludedirs
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_include_directories("MyProject" SYSTEM PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
@@ -372,15 +360,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnSysincludedirsPlatforms()
+	function suite.OnProjectCMakeListsTxt_sysincludedirs_OnSysincludedirsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		sysincludedirs { 'sysinclude' }
 		prepare()
-		androidstudio.target_include_directories(prj1)
+		androidstudio.sysincludedirs(prj1)
 		test.capture [[
-# target_include_directories
+# sysincludedirs
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_include_directories("MyProject" SYSTEM PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
@@ -389,14 +377,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnIncludedirs()
+	function suite.OnProjectCMakeListsTxt_target_includedirs_OnIncludedirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		includedirs { 'include' }
 		prepare()
-		androidstudio.target_include_directories(prj1)
+		androidstudio.includedirs(prj1)
 		test.capture [[
-# target_include_directories
+# includedirs
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_include_directories("MyProject" PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
@@ -405,15 +393,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnIncludedirsPlatforms()
+	function suite.OnProjectCMakeListsTxt_includedirs_OnIncludedirsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		includedirs { 'include' }
 		prepare()
-		androidstudio.target_include_directories(prj1)
+		androidstudio.includedirs(prj1)
 		test.capture [[
-# target_include_directories
+# includedirs
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_include_directories("MyProject" PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
@@ -422,96 +410,55 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnSysincludedirsIncludedirs()
-		project 'MyProject'
-		kind 'WindowedApp'
-		sysincludedirs { 'sysinclude' }
-		includedirs { 'include' }
-		prepare()
-		androidstudio.target_include_directories(prj1)
-		test.capture [[
-# target_include_directories
-if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-		]]
-	end
+	-- defines
 
-	function suite.OnProjectCMakeListsTxt_target_include_directories_OnSysincludedirsIncludedirsPlatforms()
-		project 'MyProject'
-		kind 'WindowedApp'
-		platforms { 'ARM', 'ARM64' }
-		sysincludedirs { 'sysinclude' }
-		includedirs { 'include' }
-		prepare()
-		androidstudio.target_include_directories(prj1)
-		test.capture [[
-# target_include_directories
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_include_directories("MyProject" SYSTEM PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
-		)
-	target_include_directories("MyProject" PRIVATE
-		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
-		)
-endif()
-		]]
-	end
-
-	-- target_compile_definitions
-
-	function suite.OnProjectCMakeListsTxt_target_compile_definitions()
+	function suite.OnProjectCMakeListsTxt_defines()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.target_compile_definitions(prj1)
+		androidstudio.defines(prj1)
 		test.capture [[
-# target_compile_definitions
+# defines
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_definitions_OnDefines()
+	function suite.OnProjectCMakeListsTxt_defines_OnDefines()
 		project 'MyProject'
 		kind 'WindowedApp'
 		defines { 'DEFINE' }
 		prepare()
-		androidstudio.target_compile_definitions(prj1)
+		androidstudio.defines(prj1)
 		test.capture [[
-# target_compile_definitions
+# defines
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_definitions("MyProject" PRIVATE "DEFINE")
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_definitions_OnDefinesPlatforms()
+	function suite.OnProjectCMakeListsTxt_defines_OnDefinesPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		defines { 'DEFINE' }
 		prepare()
-		androidstudio.target_compile_definitions(prj1)
+		androidstudio.defines(prj1)
 		test.capture [[
-# target_compile_definitions
+# defines
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_definitions("MyProject" PRIVATE "DEFINE")
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_definitions_OnDefines2()
+	function suite.OnProjectCMakeListsTxt_defines_OnDefines2()
 		project 'MyProject'
 		kind 'WindowedApp'
 		defines { 'DEFINE1', 'DEFINE2' }
 		prepare()
-		androidstudio.target_compile_definitions(prj1)
+		androidstudio.defines(prj1)
 		test.capture [[
-# target_compile_definitions
+# defines
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_definitions("MyProject" PRIVATE
 		"DEFINE1"
@@ -521,74 +468,70 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_definitions_OnDefinesFilterBuildcfg()
+	function suite.OnProjectCMakeListsTxt_defines_OnDefinesFilterBuildcfg()
 		project 'MyProject'
 		kind 'WindowedApp'
 		filter 'configurations:Release' do
 			defines { 'NDEBUG' }
 		end filter {}
 		prepare()
-		androidstudio.target_compile_definitions(prj1)
+		androidstudio.defines(prj1)
 		test.capture [[
-# target_compile_definitions
+# defines
 if("Release" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_definitions("MyProject" PRIVATE "NDEBUG")
 endif()
 		]]
 	end
 
-	-- set_target_properties
+	-- targetdir
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties()
+	function suite.OnProjectCMakeListsTxt_targetdir()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.set_target_properties(prj1)
-		test.capture [[
-# set_target_properties
-		]]
+		androidstudio.targetdir(prj1)
+		test.isemptycapture()
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindSharedLib()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindSharedLib()
 		project 'MyProject'
 		kind 'SharedLib'
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.targetdir(prj1)
 		test.capture [[
-# set_target_properties
+# targetdir
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
 		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindSharedLibPlatforms()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindSharedLibPlatforms()
 		project 'MyProject'
 		kind 'SharedLib'
 		platforms { 'ARM', 'ARM64' }
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.targetdir(prj1)
 		test.capture [[
-# set_target_properties
+# targetdir
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-fPIC"
 		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindStaticLib()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindStaticLib()
 		project 'MyProject'
 		kind 'StaticLib'
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.targetdir(prj1)
 		test.capture [[
-# set_target_properties
+# targetdir
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	set_target_properties("MyProject" PROPERTIES
 		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
@@ -597,14 +540,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindStaticLibPlatforms()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindStaticLibPlatforms()
 		project 'MyProject'
 		kind 'StaticLib'
 		platforms { 'ARM', 'ARM64' }
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.targetdir(prj1)
 		test.capture [[
-# set_target_properties
+# targetdir
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
 		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
@@ -613,38 +556,32 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedApp()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindWindowedApp()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.set_target_properties(prj1)
-		test.capture [[
-# set_target_properties
-
-		]]
+		androidstudio.targetdir(prj1)
+		test.isemptycapture()
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedAppPlatforms()
+	function suite.OnProjectCMakeListsTxt_targetdir_OnKindWindowedAppPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		prepare()
-		androidstudio.set_target_properties(prj1)
-		test.capture [[
-# set_target_properties
-
-		]]
+		androidstudio.targetdir(prj1)
+		test.isemptycapture()
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedAppVectorExtensionsARM()
+	function suite.OnProjectCMakeListsTxt_compileflags_OnKindWindowedAppVectorExtensionsARM()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM' }
 		vectorextensions 'NEON'
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.compileflags(prj1)
 		test.capture [[
-# set_target_properties
+# compileflags
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	set_target_properties("MyProject" PROPERTIES
 		COMPILE_FLAGS "-mfpu=neon"
@@ -653,72 +590,106 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_set_target_properties_OnKindWindowedAppVectorExtensionsARM64()
+	function suite.OnProjectCMakeListsTxt_compileflags_OnKindWindowedAppVectorExtensionsARM64()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM64' }
 		vectorextensions 'NEON'
 		prepare()
-		androidstudio.set_target_properties(prj1)
+		androidstudio.compileflags(prj1)
 		test.capture [[
-# set_target_properties
+# compileflags
 
 		]]
 	end
 
-	-- target_compile_options
+	-- forceincludes
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options()
+	function suite.OnProjectCMakeListsTxt_forceincludes()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.forceincludes(prj1)
 		test.capture [[
-# target_compile_options
+# forceincludes
+
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnForceincludes()
+	function suite.OnProjectCMakeListsTxt_forceincludes_OnForceincludes()
 		project 'MyProject'
 		kind 'WindowedApp'
 		forceincludes { 'file.h' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.forceincludes(prj1)
 		test.capture [[
-# target_compile_options
+# forceincludes
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
+		-include "${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnForceincludesPlatforms()
+	function suite.OnProjectCMakeListsTxt_target_forceincludes_OnForceincludesPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		forceincludes { 'file.h' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.forceincludes(prj1)
 		test.capture [[
-# target_compile_options
+# forceincludes
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
-		"-include" "file.h"
+		-include "${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnDisablearnings()
+
+	-- pchheader
+
+	function suite.OnProjectCMakeListsTxt_pchheader_OnPchheader()
+		project 'MyProject'
+		kind 'WindowedApp'
+		pchheader 'header.h'
+		prepare()
+		androidstudio.pchheader(prj1)
+		test.capture [[
+# pchheader
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	add_custom_target("MyProjectDebugGeneratePCH"
+		COMMAND
+			mkdir -p \"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug\"
+		COMMAND
+			${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64/bin/gcc++ --gcc-toolchain=${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64/sysroot --target=armv7-none-linux-androideabi${ANDROID_NATIVE_API_LEVEL} -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -m${ANDROID_ARM_MODE} -Wformat -Werror=format-security  -x c++-header \"${PREMAKE_MAIN_SCRIPT_DIR}/header.h\" -o \"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch\"
+		BYPRODUCTS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch"
+		WORKING_DIRECTORY
+			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		)
+	add_dependencies("MyProject" "MyProjectDebugGeneratePCH")
+	target_compile_options("MyProject" PRIVATE
+		-include-pch "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch"
+		)
+endif()
+		]]
+	end
+
+
+	-- warnings
+
+	function suite.OnProjectCMakeListsTxt_warnings_OnDisablearnings()
 		project 'MyProject'
 		kind 'WindowedApp'
 		disablewarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wno-warning"
@@ -727,15 +698,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnDisablewarningsPlatforms()
+	function suite.OnProjectCMakeListsTxt_warnings_OnDisablewarningsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		disablewarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wno-warning"
@@ -744,14 +715,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnEnablearnings()
+	function suite.OnProjectCMakeListsTxt_warnings_OnEnablearnings()
 		project 'MyProject'
 		kind 'WindowedApp'
 		enablewarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wwarning"
@@ -760,15 +731,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnEnablewarningsPlatforms()
+	function suite.OnProjectCMakeListsTxt_warnings_OnEnablewarningsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		enablewarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wwarning"
@@ -777,14 +748,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnFagalwarnings()
+	function suite.OnProjectCMakeListsTxt_warnings_OnFagalwarnings()
 		project 'MyProject'
 		kind 'WindowedApp'
 		fatalwarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
 		"-Werror=warning"
@@ -793,15 +764,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnFatalwarningsPlatforms()
+	function suite.OnProjectCMakeListsTxt_warnings_OnFatalwarningsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		fatalwarnings { 'warning' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.warnings(prj1)
 		test.capture [[
-# target_compile_options
+# warnings
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"-Werror=warning"
@@ -810,14 +781,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnBuildoptions()
+	function suite.OnProjectCMakeListsTxt_buildoptions_OnBuildoptions()
 		project 'MyProject'
 		kind 'WindowedApp'
 		buildoptions { 'buildoption' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.buildoptions(prj1)
 		test.capture [[
-# target_compile_options
+# buildoptions
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
 		"buildoption"
@@ -826,15 +797,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_compile_options_OnBuildoptionsPlatforms()
+	function suite.OnProjectCMakeListsTxt_buildoptions_OnBuildoptionsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		buildoptions { 'buildoption' }
 		prepare()
-		androidstudio.target_compile_options(prj1)
+		androidstudio.buildoptions(prj1)
 		test.capture [[
-# target_compile_options
+# buildoptions
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
 		"buildoption"
@@ -843,26 +814,27 @@ endif()
 		]]
 	end
 
-	-- target_link_directories
+	-- libdirs
 
-	function suite.OnProjectCMakeListsTxt_target_link_directories()
+	function suite.OnProjectCMakeListsTxt_libdirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.target_link_directories(prj1)
+		androidstudio.libdirs(prj1)
 		test.capture [[
-# target_link_directories
+# libdirs
+
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_directories_OnSyslidirs()
+	function suite.OnProjectCMakeListsTxt_libdirs_OnSyslidirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		syslibdirs { 'syslibdir' }
 		prepare()
-		androidstudio.target_link_directories(prj1)
+		androidstudio.libdirs(prj1)
 		test.capture [[
-# target_link_directories
+# libdirs
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
@@ -871,15 +843,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_directories_OnSyslidirsPlatforms()
+	function suite.OnProjectCMakeListsTxt_libdirs_OnSyslidirsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		syslibdirs { 'syslibdir' }
 		prepare()
-		androidstudio.target_link_directories(prj1)
+		androidstudio.libdirs(prj1)
 		test.capture [[
-# target_link_directories
+# libdirs
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
@@ -888,14 +860,14 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_directories_OnLidirs()
+	function suite.OnProjectCMakeListsTxt_libdirs_OnLidirs()
 		project 'MyProject'
 		kind 'WindowedApp'
 		libdirs { 'libdir' }
 		prepare()
-		androidstudio.target_link_directories(prj1)
+		androidstudio.libdirs(prj1)
 		test.capture [[
-# target_link_directories
+# libdirs
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
@@ -904,15 +876,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_directories_OnLidirsPlatforms()
+	function suite.OnProjectCMakeListsTxt_libdirs_OnLidirsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		libdirs { 'libdir' }
 		prepare()
-		androidstudio.target_link_directories(prj1)
+		androidstudio.libdirs(prj1)
 		test.capture [[
-# target_link_directories
+# libdirs
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
@@ -921,26 +893,27 @@ endif()
 		]]
 	end
 
-	-- target_link_libraries
+	-- links
 
-	function suite.OnProjectCMakeListsTxt_target_link_libraries()
+	function suite.OnProjectCMakeListsTxt_links_libraries()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prepare()
-		androidstudio.target_link_libraries(prj1)
+		androidstudio.links(prj1)
 		test.capture [[
-# target_link_libraries
+# links
+
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_libraries_OnLinks()
+	function suite.OnProjectCMakeListsTxt_links_OnLinks()
 		project 'MyProject'
 		kind 'WindowedApp'
 		links { 'link' }
 		prepare()
-		androidstudio.target_link_libraries(prj1)
+		androidstudio.links(prj1)
 		test.capture [[
-# target_link_libraries
+# links
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_link_libraries("MyProject" PRIVATE
 		"-Wl,--start-group"
@@ -951,15 +924,15 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_target_link_libraries_OnLinksPlatforms()
+	function suite.OnProjectCMakeListsTxt_links_OnLinksPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
 		links { 'link' }
 		prepare()
-		androidstudio.target_link_libraries(prj1)
+		androidstudio.links(prj1)
 		test.capture [[
-# target_link_libraries
+# links
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_link_libraries("MyProject" PRIVATE
 		"-Wl,--start-group"
@@ -970,9 +943,9 @@ endif()
 		]]
 	end
 
-	-- add_custom_command
+	-- buildcommands
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommands()
+	function suite.OnProjectCMakeListsTxt_buildcommands_OnBuildcommands()
 		project 'MyProject'
 		kind 'WindowedApp'
 		files { 'input.txt', }
@@ -988,9 +961,9 @@ endif()
 			}
 		end filter {}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.buildcommands(prj1)
 		test.capture [[
-# add_custom_target
+# buildcommands
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	# input -> output
 	add_custom_target("MyProjectDebugBuildcommand1"
@@ -1009,7 +982,7 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommandsPlatforms()
+	function suite.OnProjectCMakeListsTxt_buildcommands_OnBuildcommandsPlatforms()
 		project 'MyProject'
 		kind 'WindowedApp'
 		platforms { 'ARM', 'ARM64' }
@@ -1026,12 +999,12 @@ endif()
 			}
 		end filter {}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.buildcommands(prj1)
 		test.capture [[
-# add_custom_target
+# buildcommands
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	# input -> output
-	add_custom_target("MyProjectDebugBuildcommand1"
+	add_custom_target("MyProjectARMDebugBuildcommand1"
 		COMMAND
 			cp -rf input.txt output.txt
 		BYPRODUCTS
@@ -1042,12 +1015,12 @@ if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 		SOURCES
 			"${PREMAKE_MAIN_SCRIPT_DIR}/input.txt"
 		)
-	add_dependencies("MyProject" "MyProjectDebugBuildcommand1")
+	add_dependencies("MyProject" "MyProjectARMDebugBuildcommand1")
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnBuildcommands2()
+	function suite.OnProjectCMakeListsTxt_buildcommands_OnBuildcommands2()
 		project 'MyProject'
 		kind 'WindowedApp'
 		files { 'input.txt', 'intermidiate.txt', }
@@ -1074,9 +1047,9 @@ endif()
 			}
 		end filter {}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.buildcommands(prj1)
 		test.capture [[
-# add_custom_target
+# buildcommands
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	# intermidiate -> output
 	add_custom_target("MyProjectDebugBuildcommand2"
@@ -1108,44 +1081,17 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPchheader()
-		project 'MyProject'
-		kind 'WindowedApp'
-		pchheader 'header.h'
-		prepare()
-		androidstudio.add_custom_command(prj1)
-		test.capture [[
-# add_custom_target
-
-# add_custom_command
-if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	# Generating a PCH File
-	add_custom_command(
-		TARGET "MyProject"
-		PRE_BUILD
-		COMMAND
-			gcc  -x c++-header \"../../header.h\" -o \"../../header.h.pch\"
-		WORKING_DIRECTORY
-			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
-		)
-endif()
-		]]
-	end
-
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPrebuildcommands()
+	function suite.OnProjectCMakeListsTxt_prebuildcommands_OnPrebuildcommands()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prebuildcommands {
 			'cp -rf input.txt output.txt',
 		}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.prebuildcommands(prj1)
 		test.capture [[
-# add_custom_target
-
-# add_custom_command
+# prebuildcommands
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	# PRE_BUILD
 	add_custom_command(
 		TARGET "MyProject"
 		PRE_BUILD
@@ -1158,20 +1104,17 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPrelinkcommands()
+	function suite.OnProjectCMakeListsTxt_prelinkcommands_OnPrelinkcommands()
 		project 'MyProject'
 		kind 'WindowedApp'
 		prelinkcommands {
 			'cp -rf input.txt output.txt',
 		}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.prelinkcommands(prj1)
 		test.capture [[
-# add_custom_target
-
-# add_custom_command
+# prelinkcommands
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	# PRE_LINK
 	add_custom_command(
 		TARGET "MyProject"
 		PRE_LINK
@@ -1184,20 +1127,17 @@ endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_add_custom_command_OnPostbuildcommands()
+	function suite.OnProjectCMakeListsTxt_postbuildcommands_OnPostbuildcommands()
 		project 'MyProject'
 		kind 'WindowedApp'
 		postbuildcommands {
 			'cp -rf input.txt output.txt',
 		}
 		prepare()
-		androidstudio.add_custom_command(prj1)
+		androidstudio.postbuildcommands(prj1)
 		test.capture [[
-# add_custom_target
-
-# add_custom_command
+# postbuildcommands
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	# POST_BUILD
 	add_custom_command(
 		TARGET "MyProject"
 		POST_BUILD

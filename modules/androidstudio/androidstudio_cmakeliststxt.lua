@@ -4,6 +4,7 @@
 
 	local p = premake
 	local m = p.modules.androidstudio
+	local cmake = m.cmake
 
 	local androidstudio = p.modules.androidstudio
 	local project = p.project
@@ -11,215 +12,50 @@
 	local fileconfig = p.fileconfig
 	local tree = p.tree
 
-	m.cmake = {}
-
-	local cmake = m.cmake
-
-	cmake.minimum_required = { 3, 6, 4 }
-	cmake.buildcommands_as_add_custom_command = false
-
-
-	function cmake.getlanguages(str)
-		local LUT = {
-			['C'] = { 'C' },
-			['C++'] = { 'CXX', 'C' },
-		}
-		return LUT[str]
+	local function getdefines(cfg, callback)
+		return table.translate(cfg.defines, callback)
 	end
 
 
-	function cmake.getextensions(str)
-		local LUT = {
-			['C'] = { '.c' },
-			['C++'] = { '.c', '.c++', '.cc', '.cpp', '.cxx' },
-		}
-		return LUT[str]
-	end
-
-
-	function cmake.getkind(str)
-		local LUT = {
-			[p.SHAREDLIB]   = 'SHARED',
-			[p.STATICLIB]   = 'STATIC',
-			[p.WINDOWEDAPP] = 'SHARED',
-		}
-		return LUT[str]
-	end
-
-
-	function cmake.quoted(str)
-		return '"' .. string.gsub(str, '[\\\"]', '\\%0') .. '"'
-	end
-
-
-	function cmake.getpath(str)
-		return path.join('${PREMAKE_MAIN_SCRIPT_DIR}', path.getrelative(_MAIN_SCRIPT_DIR, str))
-	end
-
-
-	function cmake.cdialect(cfg)
-		LUT = {
-			C89 = 90,
-			C90 = 90,
-			C99 = 99,
-			C11 = 11,
-			gnu89 = 90,
-			gnu90 = 90,
-			gnu99 = 99,
-			gnu11 = 11,
-		}
-		return LUT[cfg.cdialect]
-	end
-
-
-	function cmake.cppdialect(cfg)
-		LUT = {
-			['C++98'] = 98,
-			['C++0x'] = 11,
-			['C++11'] = 11,
-			['C++1y'] = 14,
-			['C++14'] = 14,
-			['C++1z'] = 17,
-			['C++17'] = 17,
-			['gnu++98'] = 98,
-			['gnu++0x'] = 11,
-			['gnu++11'] = 11,
-			['gnu++1y'] = 14,
-			['gnu++14'] = 14,
-			['gnu++1z'] = 17,
-			['gnu++17'] = 17,
-		}
-		return LUT[cfg.cppdialect]
-	end
-
-
-	function cmake.warnings(cfg)
-		local enablewarnings = table.translate(cfg.enablewarnings, function(opt)
-			return '-W' .. opt
+	local function getsysincludedirs(cfg, callback)
+		return table.translate(cfg.sysincludedirs, function(opt)
+			return callback(cmake.getpath(opt))
 		end)
-		local disablewarnings = table.translate(cfg.disablewarnings, function(opt)
-			return '-Wno-' .. opt
+	end
+
+	local function getincludedirs(cfg, callback)
+		return table.translate(cfg.includedirs, function(opt)
+			return callback(cmake.getpath(opt))
 		end)
-		local fatalwarnings = table.translate(cfg.fatalwarnings, function(opt)
-			return '-Werror=' .. opt
-		end)
-		return table.join(enablewarnings, disablewarnings, fatalwarnings)
 	end
 
 
-	cmake.compileflags = {
-		--architecture = {
-		--	x86 = '-m32',
-		--	x86_64 = '-m64',
-		--},
-		flags = {
-			FatalCompileWarnings = '-Werror',
-			LinkTimeOptimization = '-flto',
-			ShadowedVariables = '-Wshadow',
-			UndefinedIdentifiers = '-Wundef',
-		},
-		floatabi = function (cfg, mappings)
-			if not cfg.architecture or cfg.architecture == p.ARM then
-				return {
-					soft = '-mfloat-abi=soft',
-					softfp = '-mfloat-abi=softfp',
-					hard = '-mfloat-abi=hard',
-				}
-			else
-				return {}
-			end
-		end,
-		floatingpoint = {
-			Fast = '-ffast-math',
-			Strict = '-ffloat-store',
-		},
-		isaextensions = {
-			MOVBE = '-mmovbe',
-			POPCNT = '-mpopcnt',
-			PCLMUL = '-mpclmul',
-			LZCNT = '-mlzcnt',
-			BMI = '-mbmi',
-			BMI2 = '-mbmi2',
-			F16C = '-mf16c',
-			AES = '-maes',
-			FMA = '-mfma',
-			FMA4 = '-mfma4',
-			RDRND = '-mrdrnd',
-		},
-		omitframepointer = {
-			[p.ON] = '-fomit-frame-pointer',
-			[p.OFF] = '-fno-omit-frame-pointer'
-		},
-		optimize = {
-			Off = '-O0',
-			On = '-O2',
-			Debug = '-Og',
-			Full = '-O3',
-			Size = '-Os',
-			Speed = '-O3',
-		},
-		pic = {
-			[p.ON] = '-fPIC',
-		},
-		strictaliasing = {
-			Off = '-fno-strict-aliasing',
-			Level1 = { '-fstrict-aliasing', '-Wstrict-aliasing=1' },
-			Level2 = { '-fstrict-aliasing', '-Wstrict-aliasing=2' },
-			Level3 = { '-fstrict-aliasing', '-Wstrict-aliasing=3' },
-		},
-		symbols = {
-			On = '-g',
-			FastLink = '-g',
-			Full = '-g',
-		},
-		unsignedchar = {
-			[p.ON] = '-funsigned-char',
-			[p.OFF] = '-fno-unsigned-char'
-		},
-		vectorextensions = function (cfg, mappings)
-			if not cfg.architecture or cfg.architecture == p.ARM then
-				return {
-					['NEON'] = '-mfpu=neon',
-				}
-			elseif cfg.architecture == p.ARM64 then
-				return {}
-			elseif cfg.architecture == p.X86 or cfg.architecture == p.X86_64 then
-				return {
-					['AVX'] = '-mavx',
-					['AVX2'] = '-mavx2',
-					['SSE'] = '-msse',
-					['SSE2'] = '-msse2',
-					['SSE3'] = '-msse3',
-					['SSSE3'] = '-mssse3',
-					['SSE4.1'] = '-msse4.1',
-				}
-			end
-		end,
-		warnings = {
-			Extra = {'-Wall', '-Wextra'},
-			High = '-Wall',
-			Off = '-w',
-		},
-		-- cxx
-		exceptionhandling = {
-			[p.OFF] = '-fno-exceptions',
-		},
-		flags = {
-			NoBufferSecurityCheck = '-fno-stack-protector',
-		},
-		inlinesvisibility = {
-			Hidden = '-fvisibility-inlines-hidden',
-		},
-		rtti = {
-			[p.OFF] = '-fno-rtti',
-		},
-		visibility = {
-			Default = '-fvisibility=default',
-			Hidden = '-fvisibility=hidden',
-			Internal = '-fvisibility=internal',
-			Protected = '-fvisibility=protected',
-		},
-	}
+	local function getcompileflags(cfg, callback)
+		return table.translate(config.mapFlags(cfg, cmake.compileflags), callback)
+	end
+
+
+	local function getforceincludes(cfg, callback)
+		return table.translate(cfg.forceincludes, callback)
+	end
+
+
+	local function getwarnings(cfg, callback)
+		return table.translate(cmake.warnings(cfg), callback)
+	end
+
+
+	local function getbuildoptions(cfg, callback)
+		return table.translate(cfg.buildoptions, callback)
+	end
+
+
+	local function ifcondition(cfg)
+		if cfg.platform then
+			return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")', cmake.quoted(cfg.name)
+		end
+		return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")', cmake.quoted(cfg.buildcfg)
+	end
 
 
 	function m.cmake_minimum_required(prj)
@@ -228,10 +64,10 @@
 	end
 
 
-	function m.add_subdirectory(prj)
+	function m.dependencies(prj)
 		local deps = project.getdependencies(prj)
 		if #deps > 0 then
-			_p(0, '# add_subdirectory')
+			_p(0, '# dependencies')
 			table.foreachi(deps, function(dep)
 				_x(0, 'if(NOT TARGET %s)', cmake.quoted(dep.name))
 				_p(1, 'add_subdirectory(')
@@ -256,18 +92,9 @@
 	end
 
 
-	local function ifcondition(cfg)
-		if cfg.platform then
-			return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")', cmake.quoted(cfg.name)
-		end
-		return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")', cmake.quoted(cfg.buildcfg)
-	end
-
-
-	function m.add_library(prj)
+	function m.target(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# add_library')
 			for cfg in project.eachconfig(prj) do
 				_p(0, ifcondition(cfg))
 				_x(1, 'add_library(%s %s', cmake.quoted(prj.name), cmakekind)
@@ -279,7 +106,7 @@
 					end
 				end)
 				if #options > 0 then
-					table.sort(options)
+					--table.sort(options)
 					table.foreachi(options, function(opt)
 						_p(2, opt)
 					end)
@@ -288,22 +115,21 @@
 				_p(0, 'endif()')
 			end
 		else
-			_p(0, '# add_custom_target')
 			_x(0, 'add_custom_target(%s)', cmake.quoted(prj.name))
 		end
 		p.outln('')
 	end
 
 
-	function m.add_dependencies(prj)
+	function m.dependson(prj)
 		local options = table.extract(project.getdependencies(prj, 'dependOnly'), 'name')
 		if #options > 0 then
-			_p(0, '# add_dependencies')
+			_p(0, '# dependson')
 			if #options == 1 then
 				_x(0, 'add_dependencies(%s %s)', cmake.quoted(prj.name), cmake.quoted(options[1]))
 			else
 				_x(0, 'add_dependencies(%s', cmake.quoted(prj.name))
-				table.sort(options)
+				--table.sort(options)
 				table.foreachi(options, function(opt)
 					_x(1, '%s', cmake.quoted(opt))
 				end)
@@ -314,59 +140,10 @@
 	end
 
 
-	local function getsysincludedirs(cfg, callback)
-		return table.translate(cfg.sysincludedirs, function(opt)
-			return callback(cmake.getpath(opt))
-		end)
-	end
-
-	local function getincludedirs(cfg, callback)
-		return table.translate(cfg.includedirs, function(opt)
-			return callback(cmake.getpath(opt))
-		end)
-	end
-
-	function m.target_include_directories(prj)
+	function m.defines(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# target_include_directories')
-			for cfg in project.eachconfig(prj) do
-				local sysincludedirs = getsysincludedirs(cfg, cmake.quoted)
-				local includedirs = getincludedirs(cfg, cmake.quoted)
-				if #sysincludedirs > 0 or #includedirs > 0 then
-					_p(0, ifcondition(cfg))
-					if #sysincludedirs > 0 then
-						_x(1, 'target_include_directories(%s SYSTEM PRIVATE', cmake.quoted(prj.name))
-						table.sort(sysincludedirs)
-						table.foreachi(sysincludedirs, function(opt)
-							_p(2, opt)
-						end)
-						_p(2, ')')
-					end
-					if #includedirs > 0 then
-						_x(1, 'target_include_directories(%s PRIVATE', cmake.quoted(prj.name))
-						table.sort(includedirs)
-						table.foreachi(includedirs, function(opt)
-							_p(2, opt)
-						end)
-						_p(2, ')')
-					end
-					_p(0, 'endif()')
-				end
-			end
-			p.outln('')
-		end
-	end
-
-
-	local function getdefines(cfg, callback)
-		return table.translate(cfg.defines, callback)
-	end
-
-	function m.target_compile_definitions(prj)
-		local cmakekind = cmake.getkind(prj.kind)
-		if cmakekind then
-			_p(0, '# target_compile_definitions')
+			_p(0, '# defines')
 			for cfg in project.eachconfig(prj) do
 				local options = getdefines(cfg, cmake.quoted)
 				if #options > 0 then
@@ -375,7 +152,7 @@
 						_x(1, 'target_compile_definitions(%s PRIVATE %s)', cmake.quoted(prj.name), options[1])
 					else
 						_x(1, 'target_compile_definitions(%s PRIVATE', cmake.quoted(prj.name))
-						table.sort(options)
+						--table.sort(options)
 						table.foreachi(options, function(opt)
 							_p(2, opt)
 						end)
@@ -389,57 +166,22 @@
 	end
 
 
-	local function getcompileflags(cfg, callback)
-		return table.translate(config.mapFlags(cfg, cmake.compileflags), callback)
-	end
-
-	function m.set_target_properties(prj)
+	function m.sysincludedirs(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# set_target_properties')
+			_p(0, '# sysincludedirs')
 			for cfg in project.eachconfig(prj) do
-				local tbl = {}
-				if prj.kind == p.STATICLIB then
-					tbl['ARCHIVE_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
-				elseif prj.kind == p.SHAREDLIB then
-					tbl['LIBRARY_OUTPUT_DIRECTORY'] = cmake.quoted(cmake.getpath(cfg.buildtarget.directory))
-				end
-				do
-					local cdialect = cmake.cdialect(cfg)
-					if cdialect then
-						tbl['C_STANDARD'] = cdialect
-					end
-				end
-				do
-					local cppdialect = cmake.cppdialect(cfg)
-					if cppdialect then
-						tbl['CXX_STANDARD'] = cppdialect
-					end
-				end
-				local flags = getcompileflags(cfg, cmake.quoted)
-				local keys = table.keys(tbl)
-				local options = table.join(flags)
-				local function outoptions()
-					table.foreachi(options, function(opt)
-						_x(2, 'COMPILE_FLAGS %s', opt)
-					end)
-					return true
-				end
-				if #keys > 0 or #options > 0 then
+				local sysincludedirs = getsysincludedirs(cfg, cmake.quoted)
+				if #sysincludedirs > 0 then
 					_p(0, ifcondition(cfg))
-					_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
-					table.sort(options)
-					local isout = false
-					for key, value in spairs(tbl) do
-						if not isout and key > 'COMPILE_FLAGS' then
-							isout = outoptions()
-						end
-						_x(2, '%s %s', key, value)
+					if #sysincludedirs > 0 then
+						_x(1, 'target_include_directories(%s SYSTEM PRIVATE', cmake.quoted(prj.name))
+						--table.sort(sysincludedirs)
+						table.foreachi(sysincludedirs, function(opt)
+							_p(2, opt)
+						end)
+						_p(2, ')')
 					end
-					if not isout then
-						outoptions()
-					end
-				_p(2, ')')
 					_p(0, 'endif()')
 				end
 			end
@@ -448,29 +190,80 @@
 	end
 
 
-	local function getbuildoptions(cfg, callback)
-		local warnings = table.translate(cmake.warnings(cfg), callback)
-		local options = table.translate(cfg.buildoptions, callback)
-		return table.join(warnings, options)
-	end
-
-	function m.target_compile_options(prj)
+	function m.includedirs(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# target_compile_options')
+			_p(0, '# includedirs')
 			for cfg in project.eachconfig(prj) do
-				local forceincludes = table.translate(cfg.forceincludes, function(opt)
-					return '"-include" ' .. cmake.quoted(project.getrelative(prj, opt))
-				end)
-				local buildoptions = getbuildoptions(cfg, cmake.quoted)
-				local options = table.join(forceincludes, buildoptions)
+				local includedirs = getincludedirs(cfg, cmake.quoted)
+				if #includedirs > 0 then
+					_p(0, ifcondition(cfg))
+					if #includedirs > 0 then
+						_x(1, 'target_include_directories(%s PRIVATE', cmake.quoted(prj.name))
+						--table.sort(includedirs)
+						table.foreachi(includedirs, function(opt)
+							_p(2, opt)
+						end)
+						_p(2, ')')
+					end
+					_p(0, 'endif()')
+				end
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.targetdir(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if prj.kind == p.STATICLIB or prj.kind == p.SHAREDLIB then
+			_p(0, '# targetdir')
+			for cfg in project.eachconfig(prj) do
+				_p(0, ifcondition(cfg))
+				_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
+				if prj.kind == p.STATICLIB then
+					_x(2, 'ARCHIVE_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
+				elseif prj.kind == p.SHAREDLIB then
+					_x(2, 'LIBRARY_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
+				end
+				_p(2, ')')
+				_p(0, 'endif()')
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.dialect(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# dialect')
+			for cfg in project.eachconfig(prj) do
+				_p(0, ifcondition(cfg))
+				_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
+				_x(2, 'C_STANDARD %s', cmake.cdialect(cfg))
+				_x(2, 'CXX_STANDARD %s', cmake.cppdialect(cfg))
+				_p(2, ')')
+				_p(0, 'endif()')
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.compileflags(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# compileflags')
+			for cfg in project.eachconfig(prj) do
+				local options = getcompileflags(cfg, cmake.quoted)
 				if #options > 0 then
 					_p(0, ifcondition(cfg))
-					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
-					table.sort(options)
-					for _, opt in ipairs(options) do
-						_p(2, opt)
-					end
+					_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.foreachi(options, function(opt)
+						_x(2, 'COMPILE_FLAGS %s', opt)
+					end)
 					_p(2, ')')
 					_p(0, 'endif()')
 				end
@@ -480,10 +273,194 @@
 	end
 
 
-	function m.target_link_directories(prj)
+	function m.pchheader(prj)
+		_p(0, '# pchheader')
+		for cfg in project.eachconfig(prj) do
+			if cfg.pchheader and not cfg.flags.NoPCH then
+				-- Visual Studio requires the PCH header to be specified in the same way
+				-- it appears in the #include statements used in the source code; the PCH
+				-- source actual handles the compilation of the header. GCC compiles the
+				-- header file directly, and needs the file's actual file system path in
+				-- order to locate it.
+
+				-- To maximize the compatibility between the two approaches, see if I can
+				-- locate the specified PCH header on one of the include file search paths
+				-- and, if so, adjust the path automatically so the user doesn't have
+				-- add a conditional configuration to the project script.
+
+				local pch = cfg.pchheader
+				local found = false
+
+				-- test locally in the project folder first (this is the most likely location)
+				local testname = path.join(cfg.project.basedir, pch)
+				if os.isfile(testname) then
+					pch = testname
+					found = true
+				else
+					-- else scan in all include dirs.
+					for _, incdir in ipairs(cfg.includedirs) do
+						testname = path.join(incdir, pch)
+						if os.isfile(testname) then
+							pch = testname
+							found = true
+							break
+						end
+					end
+				end
+
+				if not found then
+					pch = path.getabsolute(pch)
+				end
+
+				pch = cmake.getpath(pch)
+
+				local options = table.flatten {
+					getdefines(cfg, function (opt)
+						return string.gsub('"-D' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getsysincludedirs(cfg, function (opt)
+						return string.gsub('"-isystem ' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getincludedirs(cfg, function (opt)
+						return string.gsub('"-I' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getcompileflags(cfg, function (opt)
+						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getforceincludes(cfg, function (opt)
+						return '-include ' .. string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getwarnings(cfg, function (opt)
+						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+					getbuildoptions(cfg, function (opt)
+						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+					end),
+				}
+				if not prj.language or prj.language == 'C++' then
+					local cppdialect = cmake.cppdialect(cfg)
+					if cppdialect then
+						table.insert(options, '-std=gnu++' .. cppdialect)
+					end
+				elseif prj.language == 'C' then
+					local cdialect = cmake.cdialect(cfg)
+					if cdialect then
+						table.insert(options, '-std=gnu' .. cdialect)
+					end
+				end
+				--table.sort(options)
+
+				local name = cmake.quoted(prj.name .. (cfg.platform or '') .. cfg.buildcfg .. 'GeneratePCH')
+				local host = 'linux'
+				if os.ishost('macosx') then
+					host = 'darwin'
+				elseif os.ishost('windows') then
+					host = 'windows'
+				end
+				local toolchain = string.format('${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/%s-x86_64', host)
+				local toolset = cfg.toolset
+				local architecture = cfg.architecture or 'ARM'
+				local target = ({ARM = 'armv7-none-linux-androideabi', ARM64 = 'aarch64-none-linux-android', x86 = 'i686-none-linux-android', x86_64 = 'x86_64-none-linux-android'})[architecture] .. '${ANDROID_NATIVE_API_LEVEL}'
+				local language = string.lower(prj.language)
+				local header = string.gsub(pch, '[\\"()]', '\\%1')
+				local binary = string.gsub(cmake.getpath(path.join(cfg.objdir, os.uuid(pch) .. '.pch')), '[\\"()]', '\\%1')
+				_p(0, ifcondition(cfg))
+
+				_p(1, 'add_custom_target(%s', name)
+				_p(2, 'COMMAND')
+				_x(3, 'mkdir -p \\"%s\\"', path.getdirectory(binary))
+				_p(2, 'COMMAND')
+				_x(3, '%s/bin/%s++ --gcc-toolchain=%s --sysroot=%s/sysroot --target=%s -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig %s -Wformat -Werror=format-security %s -x %s-header \\"%s\\" -o \\"%s\\"', toolchain, toolset, toolchain, toolchain, target, iif(architecture == 'ARM', '-march=armv7-a -m${ANDROID_ARM_MODE}', ''), table.concat(options, ' '), language, header, binary)
+				_p(2, 'BYPRODUCTS')
+				_x(3, '%s', cmake.quoted(binary))
+				_p(2, 'WORKING_DIRECTORY')
+				_p(3, cmake.quoted(cmake.getpath(prj.location)))
+				_p(2, ')')
+				_x(1, 'add_dependencies(%s %s)', cmake.quoted(prj.name), name)
+
+				_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
+				_x(2, '-include-pch %s', cmake.quoted(binary))
+				_p(2, ')')
+
+				_p(0, 'endif()')
+			end
+		end
+		_p(0, '')
+	end
+
+
+	function m.forceincludes(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# target_link_directories')
+			_p(0, '# forceincludes')
+			for cfg in project.eachconfig(prj) do
+				local options = getforceincludes(cfg, function (opt)
+					return '-include ' .. cmake.quoted(cmake.getpath(opt))
+				end)
+				if #options > 0 then
+					_p(0, ifcondition(cfg))
+					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.foreachi(options, function (opt) 
+						_p(2, opt)
+					end)
+					_p(2, ')')
+					_p(0, 'endif()')
+				end
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.warnings(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# warnings')
+			for cfg in project.eachconfig(prj) do
+				local options = getwarnings(cfg, cmake.quoted)
+				if #options > 0 then
+					_p(0, ifcondition(cfg))
+					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.foreachi(options, function (opt) 
+						_p(2, opt)
+					end)
+					_p(2, ')')
+					_p(0, 'endif()')
+				end
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.buildoptions(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# buildoptions')
+			for cfg in project.eachconfig(prj) do
+				local options = getbuildoptions(cfg, cmake.quoted)
+				if #options > 0 then
+					_p(0, ifcondition(cfg))
+					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.foreachi(options, function (opt) 
+						_p(2, opt)
+					end)
+					_p(2, ')')
+					_p(0, 'endif()')
+				end
+			end
+			p.outln('')
+		end
+	end
+
+
+	function m.libdirs(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# libdirs')
 			for cfg in project.eachconfig(prj) do
 				local libdirs = table.unique(table.join(
 					config.getlinks(cfg, 'system', 'directory'),
@@ -500,7 +477,7 @@
 					if #options > 0 then
 						_p(0, ifcondition(cfg))
 						_x(1, 'target_link_directories(%s PRIVATE', cmake.quoted(prj.name))
-						table.sort(options)
+						--table.sort(options)
 						table.foreachi(options, function(opt)
 							_p(2, opt)
 						end)
@@ -516,7 +493,7 @@
 					if #options > 0 then
 						_p(0, ifcondition(cfg))
 						_x(1, 'target_link_libraries(%s PRIVATE', cmake.quoted(prj.name))
-						table.sort(options)
+						--table.sort(options)
 						table.foreachi(options, function(opt)
 							_p(2, opt)
 						end)
@@ -529,16 +506,16 @@
 		end
 	end
 
-	function m.target_link_libraries(prj)
+	function m.links(prj)
 		local cmakekind = cmake.getkind(prj.kind)
 		if cmakekind then
-			_p(0, '# target_link_libraries')
+			_p(0, '# links')
 			for cfg in project.eachconfig(prj) do
-				local links = table.unique(table.join(
+				local options = table.unique(table.join(
 					config.getlinks(cfg, 'siblings', 'name'),
 					config.getlinks(cfg, 'system', 'name')
 				))
-				links = table.translate(links, function(opt)
+				options = table.translate(options, function(opt)
 					if string.sub(opt, 1, 3) == 'lib' then
 						if string.sub(opt, -2) == '.a' then
 							opt = string.sub(opt, 4, -3)
@@ -548,17 +525,12 @@
 					end
 					return cmake.quoted(opt)
 				end)
-				table.sort(links)
-				if #links > 0 then
-					table.insert(links, 1, cmake.quoted('-Wl,--start-group'))
-					table.insert(links, cmake.quoted('-Wl,--end-group'))
-				end
-				local linkoptions = table.translate(cfg.linkoptions, cmake.quoted)
-				table.sort(linkoptions)
-				local options = table.join(links, linkoptions)
 				if #options > 0 then
 					_p(0, ifcondition(cfg))
 					_x(1, 'target_link_libraries(%s PRIVATE', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.insert(options, 1, cmake.quoted('-Wl,--start-group'))
+					table.insert(options, cmake.quoted('-Wl,--end-group'))
 					table.foreachi(options, function(opt)
 						_p(2, opt)
 					end)
@@ -571,8 +543,29 @@
 	end
 
 
-	function m.add_custom_command(prj)
+	function m.linkoptions(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if cmakekind then
+			_p(0, '# linkoptions')
+			for cfg in project.eachconfig(prj) do
+				local options = table.translate(cfg.linkoptions, cmake.quoted)
+				if #options > 0 then
+					_p(0, ifcondition(cfg))
+					_x(1, 'target_link_libraries(%s PRIVATE', cmake.quoted(prj.name))
+					--table.sort(options)
+					table.foreachi(options, function(opt)
+						_p(2, opt)
+					end)
+					_p(2, ')')
+					_p(0, 'endif()')
+				end
+			end
+			p.outln('')
+		end
+	end
 
+
+	function m.buildcommands(prj)
 		local buildcommands = {}
 		local tr = project.getsourcetree(prj)
 		for cfg in project.eachconfig(prj) do
@@ -643,14 +636,14 @@
 			end
 		end
 
-		_p(0, iif(m.cmake.buildcommands_as_add_custom_command, '# add_custom_command', '# add_custom_target'))
+		_p(0, '# buildcommands')
 		for cfg in project.eachconfig(prj) do
 			if #buildcommands[cfg] > 0 then
 				_p(0, ifcondition(cfg))
 				local prevname = cmake.quoted(prj.name)
 				for i = #buildcommands[cfg], 1, -1 do
 					local info = buildcommands[cfg][i]
-					local name = cmake.quoted(prj.name .. cfg.buildcfg .. 'Buildcommand' .. i)
+					local name = cmake.quoted(prj.name .. (cfg.platform or '') .. cfg.buildcfg .. 'Buildcommand' .. i)
 					_p(1, '# %s', info.message)
 					if m.cmake.buildcommands_as_add_custom_command then
 						_p(1, 'add_custom_command(')
@@ -694,134 +687,51 @@
 			end
 		end
 
-		if not m.cmake.buildcommands_as_add_custom_command then
-			p.outln('')
-			_p(0, '# add_custom_command')
-		end
+		p.outln('')
+	end
 
-		for cfg in project.eachconfig(prj) do	
-			if (cfg.pchheader and not cfg.flags.NoPCH) or #cfg.prebuildcommands > 0 or #cfg.prelinkcommands > 0 or #cfg.postbuildcommands > 0 then
+	local function buildevent(prj, target)
+		local when = ({prebuild = 'PRE_BUILD', prelink = 'PRE_LINK', postbuild = 'POST_BUILD' })[target]
+
+		_x(0, '# %scommands', target)
+		for cfg in project.eachconfig(prj) do
+			local commands = cfg[target .. 'commands']
+			local message = cfg[target .. 'message']	
+			if #commands > 0 then
 				_p(0, ifcondition(cfg))
-
-				if cfg.pchheader and not cfg.flags.NoPCH then
-
-					-- Visual Studio requires the PCH header to be specified in the same way
-					-- it appears in the #include statements used in the source code; the PCH
-					-- source actual handles the compilation of the header. GCC compiles the
-					-- header file directly, and needs the file's actual file system path in
-					-- order to locate it.
-
-					-- To maximize the compatibility between the two approaches, see if I can
-					-- locate the specified PCH header on one of the include file search paths
-					-- and, if so, adjust the path automatically so the user doesn't have
-					-- add a conditional configuration to the project script.
-
-					local pch = cfg.pchheader
-					local found = false
-
-					-- test locally in the project folder first (this is the most likely location)
-					local testname = path.join(cfg.project.basedir, pch)
-					if os.isfile(testname) then
-						pch = project.getrelative(cfg.project, testname)
-						found = true
-					else
-						-- else scan in all include dirs.
-						for _, incdir in ipairs(cfg.includedirs) do
-							testname = path.join(incdir, pch)
-							if os.isfile(testname) then
-								pch = project.getrelative(cfg.project, testname)
-								found = true
-								break
-							end
-						end
-					end
-
-					if not found then
-						pch = project.getrelative(cfg.project, path.getabsolute(pch))
-					end
-
-					local options = table.merge(
-						getdefines(cfg, function (opt)
-							return tring.gsub('"-D' .. opt .. '"', '[\\()]', '\\%1')
-						end),
-						getsysincludedirs(cfg, function (opt)
-							return tring.gsub('"-I' .. opt .. '"', '[\\()]', '\\%1')
-						end),
-						getincludedirs(cfg, function (opt)
-							return tring.gsub('"-I' .. opt .. '"', '[\\()]', '\\%1')
-						end),
-						getbuildoptions(cfg, function (opt)
-							return tring.gsub('"' .. opt .. '"', '[\\()]', '\\%1')
-						end),
-						getcompileflags(cfg, function (opt)
-							return tring.gsub('"' .. opt .. '"', '[\\()]', '\\%1')
-						end)
-					)
-					do
-						local cdialect = cmake.cdialect(cfg)
-						if cdialect then
-							table.insert(options, '-std=' .. cdialect)
-						end
-						local cppdialect = cmake.cppdialect(cfg)
-						if cppdialect then
-							table.insert(options, '-std=' .. cppdialect)
-						end
-					end
-					table.sort(options)
-
-					local toolset = cfg.toolset
-					local language = string.lower(prj.language)
-					local pathname = string.gsub(pch, '[\\()]', '\\%1')
-					_p(1, '# Generating a PCH File')
-					_p(1, 'add_custom_command(')
-					_x(2, 'TARGET %s', cmake.quoted(prj.name))
-					_p(2, 'PRE_BUILD')
+				_p(1, 'add_custom_command(')
+				_x(2, 'TARGET %s', cmake.quoted(prj.name))
+				_p(2, when)
+				table.foreachi(commands, function(command)
 					_p(2, 'COMMAND')
-					_x(3, '%s %s -x %s-header \\"%s\\" -o \\"%s.pch\\"', toolset, table.concat(options, ' '), language, pathname, pathname)
-					_p(2, 'WORKING_DIRECTORY')
-					_p(3, cmake.quoted(cmake.getpath(prj.location)))
-					_p(2, ')')
-				end
-
-				table.foreachi({
-					{
-						commands = cfg.prebuildcommands,
-						message = cfg.prebuildmessage,
-						when = 'PRE_BUILD',
-					},
-					{
-						commands = cfg.prelinkcommands,
-						message = cfg.prelinkmessage,
-						when = 'PRE_LINK',
-					},
-					{
-						commands = cfg.postbuildcommands,
-						message = cfg.postbuildmessage,
-						when = 'POST_BUILD',
-					},
-				}, function (tbl)
-					if #tbl.commands > 0 then
-						_x(1, '# %s', tbl.message or tbl.when)
-						_p(1, 'add_custom_command(')
-						_x(2, 'TARGET %s', cmake.quoted(prj.name))
-						_p(2, tbl.when)
-						table.foreachi(tbl.commands, function(command)
-							_p(2, 'COMMAND')
-							_x(3, '%s', string.gsub(command, '[\\\"()]', '\\%1'))
-						end)
-						_p(2, 'WORKING_DIRECTORY')
-						_p(3, cmake.quoted(cmake.getpath(prj.location)))
-						if tbl.message then
-							_p(2, 'COMMENT')
-							_x(3, '%s', tbl.message)
-						end
-						_p(2, ')')
-					end
+					_x(3, '%s', string.gsub(command, '[\\\"()]', '\\%1'))
 				end)
+				_p(2, 'WORKING_DIRECTORY')
+				_p(3, cmake.quoted(cmake.getpath(prj.location)))
+				if message then
+					_p(2, 'COMMENT')
+					_x(3, '%s', message)
+				end
+				_p(2, ')')
 				_p(0, 'endif()')
 			end
 		end
 		p.outln('')
+	end
+
+
+	function m.prebuildcommands(prj)
+		buildevent(prj, 'prebuild')
+	end
+
+
+	function m.prelinkcommands(prj)
+		buildevent(prj, 'prelink')
+	end
+
+
+	function m.postbuildcommands(prj)
+		buildevent(prj, 'postbuild')
 	end
 
 
@@ -830,17 +740,27 @@
 	m.elements.project_cmakeliststxt = function(prj)
 		return {
 			m.cmake_minimum_required,
-			m.add_subdirectory,
+			m.dependencies,
 			m.project,
-			m.add_library,
-			m.add_dependencies,
-			m.target_include_directories,
-			m.target_compile_definitions,
-			m.set_target_properties,
-			m.target_compile_options,
-			m.target_link_directories,
-			m.target_link_libraries,
-			m.add_custom_command,
+			m.target,
+			m.dependson,
+			m.defines,
+			m.sysincludedirs,
+			m.includedirs,
+			m.targetdir,
+			m.dialect,
+			m.compileflags,
+			m.pchheader,
+			m.forceincludes,
+			m.warnings,
+			m.buildoptions,
+			m.libdirs,
+			m.links,
+			m.linkoptions,
+			m.buildcommands,
+			m.prebuildcommands,
+			m.prelinkcommands,
+			m.postbuildcommands,
 		}
 	end
 
