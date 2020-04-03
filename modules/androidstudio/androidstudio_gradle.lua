@@ -257,9 +257,6 @@
 				function ()
 					return string.format('"-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\\\", "/")}/%s"', path.getrelative(prj.location, _MAIN_SCRIPT_DIR))
 				end,
-				function ()
-					return string.format('"-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\\\", "/")}/%s"', path.getrelative(prj.location, _PREMAKE_DIR))
-				end,
 				value,
 			}))
 			buildgradle[key or indices] = value
@@ -269,7 +266,7 @@
 		do
 			local indices = split_index('android.flavorDimensions')
 			local key, value = get_indices_and_value(buildgradle, indices)
-			buildgradle[key or indices] = table.unique(table.flatten({ 'premake.platforms', value }))
+			buildgradle[key or indices] = table.unique(table.flatten({ 'premakePlatforms', value }))
 		end
 
 		for cfg in project.eachconfig(prj) do
@@ -301,7 +298,7 @@
 					local indices = split_index('android.productFlavors[%s].dimension', quoted(cfg.platform, true))
 					local key, value = get_indices_and_value(buildgradle, indices)
 					if not key then
-						buildgradle[indices] = 'premake.platforms'
+						buildgradle[indices] = 'premakePlatforms'
 					end
 				end
 
