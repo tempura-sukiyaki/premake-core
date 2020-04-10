@@ -307,6 +307,7 @@
 		else
 			return {
 				m.clCompile,
+				m.buildStep,
 				m.fxCompile,
 				m.resourceCompile,
 				m.linker,
@@ -393,6 +394,31 @@
 		p.push('<ClCompile>')
 		p.callArray(m.elements.clCompile, cfg)
 		p.pop('</ClCompile>')
+	end
+
+--
+-- Write the the <CustomBuildStep> compiler settings block.
+--
+
+	m.elements.buildStep = function(cfg)
+		local calls = {
+			m.buildCommands,
+			m.buildMessage,
+			m.buildOutputs,
+			m.buildInputs
+		}
+
+		return calls
+	end
+
+	function m.buildStep(cfg)
+		if #cfg.buildCommands > 0 or #cfg.buildOutputs > 0 or #cfg.buildInputs > 0 or cfg.buildMessage then
+
+			p.push('<CustomBuildStep>')
+			p.callArray(m.elements.buildStep, cfg)
+			p.pop('</CustomBuildStep>')
+
+		end
 	end
 
 
@@ -753,7 +779,7 @@
 ---
 	m.categories.ClCompile = {
 		name       = "ClCompile",
-		extensions = { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm" },
+		extensions = { ".cc", ".cpp", ".cxx", ".c++", ".c", ".s", ".m", ".mm" },
 		priority   = 2,
 
 		emitFiles = function(prj, group)
@@ -865,9 +891,7 @@
 				m.excludedFromBuild
 			}
 
-			m.emitFiles(prj, group, "ResourceCompile", nil, fileCfgFunc, function(cfg)
-				return cfg.system == p.WINDOWS
-			end)
+			m.emitFiles(prj, group, "ResourceCompile", nil, fileCfgFunc)
 		end,
 
 		emitFilter = function(prj, group)
@@ -1514,6 +1538,12 @@
 		end
 	end
 
+	function m.buildInputs(cfg, condition)
+		if cfg.buildinputs and #cfg.buildinputs > 0 then
+			local inputs = project.getrelative(cfg.project, cfg.buildinputs)
+			m.element("Inputs", condition, '%s', table.concat(inputs, ";"))
+		end
+	end
 
 	function m.buildAdditionalInputs(fcfg, condition)
 		if fcfg.buildinputs and #fcfg.buildinputs > 0 then
@@ -1524,9 +1554,10 @@
 
 
 	function m.buildCommands(fcfg, condition)
-		local commands = os.translateCommandsAndPaths(fcfg.buildcommands, fcfg.project.basedir, fcfg.project.location)
-		commands = table.concat(commands,'\r\n')
-		m.element("Command", condition, '%s', commands)
+		if #fcfg.buildcommands > 0 then
+			local commands = os.translateCommandsAndPaths(fcfg.buildcommands, fcfg.project.basedir, fcfg.project.location)
+			m.element("Command", condition, '%s', table.concat(commands,'\r\n'))
+		end
 	end
 
 
@@ -1547,8 +1578,10 @@
 
 
 	function m.buildOutputs(fcfg, condition)
-		local outputs = project.getrelative(fcfg.project, fcfg.buildoutputs)
-		m.element("Outputs", condition, '%s', table.concat(outputs, ";"))
+		if #fcfg.buildoutputs > 0 then
+			local outputs = project.getrelative(fcfg.project, fcfg.buildoutputs)
+			m.element("Outputs", condition, '%s', table.concat(outputs, ";"))
+		end
 	end
 
 

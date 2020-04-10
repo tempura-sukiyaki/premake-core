@@ -182,6 +182,8 @@
 			"Default",
 			"C",
 			"C++",
+			"Objective-C",
+			"Objective-C++",
 		}
 	}
 
@@ -591,6 +593,13 @@
 		name = "dotnetframework",
 		scope = "config",
 		kind = "string",
+	}
+
+	api.register {
+		name = "enabledefaultcompileitems",
+		scope = "config",
+		kind = "boolean",
+		default = false
 	}
 
 	api.register {
@@ -1645,6 +1654,7 @@
 		allowed = {
 			{ "clang", "Clang (clang)" },
 			{ "gcc", "GNU GCC (gcc/g++)" },
+			{ "mingw", "MinGW GCC (gcc/g++)" },
 		}
 	}
 
