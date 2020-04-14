@@ -328,7 +328,7 @@
 						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
 					end),
 					getforceincludes(cfg, function (opt)
-						return '-include ' .. string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+						return string.gsub('"-include ' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
 					end),
 					getwarnings(cfg, function (opt)
 						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
@@ -364,13 +364,18 @@
 				local language = string.lower(prj.language)
 				local header = string.gsub(pch, '[\\"()]', '\\%1')
 				local binary = string.gsub(cmake.getpath(path.join(cfg.objdir, os.uuid(pch) .. '.pch')), '[\\"()]', '\\%1')
+				local cc = string.format('%s/bin/%s', toolchain, toolset)
+				local cxx = string.format('%s/bin/%s++', toolchain, toolset)
+				local ccorcxx = iif(prj.language == 'C', cc, cxx)
+				local sysroot = string.format('%s/sysroot', toolchain)
+
 				_p(0, ifcondition(cfg))
 
 				_p(1, 'add_custom_target(%s', name)
 				_p(2, 'COMMAND')
 				_x(3, 'mkdir -p \\"%s\\"', path.getdirectory(binary))
 				_p(2, 'COMMAND')
-				_x(3, '%s/bin/%s++ --gcc-toolchain=%s --sysroot=%s/sysroot --target=%s -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig %s -Wformat -Werror=format-security %s -x %s-header \\"%s\\" -o \\"%s\\"', toolchain, toolset, toolchain, toolchain, target, iif(architecture == 'ARM', '-march=armv7-a -m${ANDROID_ARM_MODE}', ''), table.concat(options, ' '), language, header, binary)
+				_x(3, '%s --gcc-toolchain=%s --sysroot=%s --target=%s -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig %s -Wformat -Werror=format-security %s -x %s-header \\"%s\\" -o \\"%s\\"', ccorcxx, toolchain, sysroot, target, iif(architecture == 'ARM', '-march=armv7-a -m${ANDROID_ARM_MODE}', ''), table.concat(options, ' '), language, header, binary)
 				_p(2, 'BYPRODUCTS')
 				_x(3, '%s', cmake.quoted(binary))
 				_p(2, 'WORKING_DIRECTORY')
@@ -395,7 +400,7 @@
 			_p(0, '# forceincludes')
 			for cfg in project.eachconfig(prj) do
 				local options = getforceincludes(cfg, function (opt)
-					return '-include ' .. cmake.quoted(cmake.getpath(opt))
+					return cmake.quoted('-include ' .. cmake.getpath(opt))
 				end)
 				if #options > 0 then
 					_p(0, ifcondition(cfg))

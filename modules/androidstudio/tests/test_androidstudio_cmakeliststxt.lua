@@ -626,7 +626,7 @@ endif()
 # forceincludes
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	target_compile_options("MyProject" PRIVATE
-		-include "${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
+		"-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]
@@ -643,7 +643,7 @@ endif()
 # forceincludes
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
 	target_compile_options("MyProject" PRIVATE
-		-include "${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
+		"-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]

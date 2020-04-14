@@ -273,7 +273,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
 			}
 		}
 		minSdkVersion 14
@@ -285,7 +285,7 @@ android {
 			path "CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premake.platforms"
+	flavorDimensions "premakePlatforms"
 }
 		]]
 	end
@@ -391,7 +391,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release", "-DDEFINE"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE"
 		]]
 	end
 
@@ -430,7 +430,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release", "-DDEFINE1", "-DDEFINE2"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DDEFINE1", "-DDEFINE2"
 		]]
 	end
 
@@ -464,7 +464,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
 			}
 		}
 		minSdkVersion 14
@@ -476,10 +476,10 @@ android {
 			path "CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premake.platforms"
+	flavorDimensions "premakePlatforms"
 	productFlavors {
 		ARM {
-			dimension "premake.platforms"
+			dimension "premakePlatforms"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM"
@@ -490,7 +490,7 @@ android {
 			}
 		}
 		ARM64 {
-			dimension "premake.platforms"
+			dimension "premakePlatforms"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM64"
@@ -501,7 +501,7 @@ android {
 			}
 		}
 		x86 {
-			dimension "premake.platforms"
+			dimension "premakePlatforms"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=x86"
@@ -512,7 +512,7 @@ android {
 			}
 		}
 		x86_64 {
-			dimension "premake.platforms"
+			dimension "premakePlatforms"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=x86_64"
@@ -561,7 +561,7 @@ android {
 	defaultConfig {
 		externalNativeBuild {
 			cmake {
-				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../..", "-DPREMAKE_PREMAKE_DIR=${projectDir.path.tr("\\", "/")}/../../bin/release"
+				arguments "-DPREMAKE_MAIN_SCRIPT_DIR=${projectDir.path.tr("\\", "/")}/../.."
 			}
 		}
 		minSdkVersion 14
@@ -573,7 +573,7 @@ android {
 			path "CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premake.platforms"
+	flavorDimensions "premakePlatforms"
 	sourceSets {
 		main {
 			java {
