@@ -625,8 +625,8 @@ endif()
 		test.capture [[
 # forceincludes
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	target_compile_options("MyProject" PRIVATE
-		"-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
+	set_target_properties("MyProject" PROPERTIES
+		COMPILE_FLAGS "-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]
@@ -642,8 +642,8 @@ endif()
 		test.capture [[
 # forceincludes
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	target_compile_options("MyProject" PRIVATE
-		"-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
+	set_target_properties("MyProject" PROPERTIES
+		COMPILE_FLAGS "-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
 endif()
 		]]
