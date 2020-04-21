@@ -149,47 +149,36 @@
 				RDRND = '-mrdrnd',
 			},
 			omitframepointer = {
+				[p.OFF] = '-fno-omit-frame-pointer',
 				[p.ON] = '-fomit-frame-pointer',
-				[p.OFF] = '-fno-omit-frame-pointer'
 			},
-			optimize = function (cfg, mappings)
-				if not cfg.architecture or cfg.architecture == p.ARM then
-					return {
-						Off = '-O0',
-						On = '-O2',
-						Debug = '-Og',
-						Full = '-Oz',
-						Size = '-Os',
-						Speed = '-Oz',
-					}
-				else
-					return {
-						Off = '-O0',
-						On = '-O2',
-						Debug = '-Og',
-						Full = '-O3',
-						Size = '-Os',
-						Speed = '-O3',
-					}
-				end
-			end,
+			optimize = {
+				[p.OFF] = '-O0',
+				[p.ON] = '-O2',
+				Debug = '-Og',
+				Full = '-O3',
+				Size = '-Os',
+				Speed = '-O3',
+			},
 			pic = {
+				[p.OFF] = '-fno-PIC',
 				[p.ON] = '-fPIC',
 			},
 			strictaliasing = {
-				Off = '-fno-strict-aliasing',
+				[p.OFF] = '-fno-strict-aliasing',
 				Level1 = { '-fstrict-aliasing', '-Wstrict-aliasing=1' },
 				Level2 = { '-fstrict-aliasing', '-Wstrict-aliasing=2' },
 				Level3 = { '-fstrict-aliasing', '-Wstrict-aliasing=3' },
 			},
 			symbols = {
-				On = '-g',
+				[p.OFF] = '-g0',
+				[p.ON] = '-g',
 				FastLink = '-g',
 				Full = '-g',
 			},
 			unsignedchar = {
+				[p.OFF] = '-fno-unsigned-char',
 				[p.ON] = '-funsigned-char',
-				[p.OFF] = '-fno-unsigned-char'
 			},
 			vectorextensions = function (cfg, mappings)
 				if not cfg.architecture or cfg.architecture == p.ARM then
@@ -211,9 +200,9 @@
 				end
 			end,
 			warnings = {
+				[p.OFF] = '-w',
 				Extra = {'-Wall', '-Wextra'},
 				High = '-Wall',
-				Off = '-w',
 			},
 		},
 		-- cxx
@@ -239,7 +228,7 @@
 		}
 	)
 
-	
+
 	function cmake.getsysincludedirs(cfg, callback)
 		return table.translate(cfg.sysincludedirs, callback)
 	end

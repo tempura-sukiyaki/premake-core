@@ -259,10 +259,10 @@
 				local options = getcompileflags(cfg, cmake.quoted)
 				if #options > 0 then
 					_p(0, ifcondition(cfg))
-					_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
+					_x(1, 'target_compile_options(%s PRIVATE', cmake.quoted(prj.name))
 					--table.sort(options)
 					table.foreachi(options, function(opt)
-						_x(2, 'COMPILE_FLAGS %s', opt)
+						_x(2, '%s', opt)
 					end)
 					_p(2, ')')
 					_p(0, 'endif()')

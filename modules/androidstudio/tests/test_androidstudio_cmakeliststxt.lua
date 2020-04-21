@@ -583,8 +583,8 @@ endif()
 		test.capture [[
 # compileflags
 if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		COMPILE_FLAGS "-mfpu=neon"
+	target_compile_options("MyProject" PRIVATE
+		"-mfpu=neon"
 		)
 endif()
 		]]
