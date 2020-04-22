@@ -364,6 +364,7 @@
 				local language = string.lower(prj.language)
 				local header = string.gsub(pch, '[\\"()]', '\\%1')
 				local binary = string.gsub(cmake.getpath(path.join(cfg.objdir, os.uuid(pch) .. '.pch')), '[\\"()]', '\\%1')
+				local binarydir = path.getdirectory(binary)
 				local cc = string.format('%s/bin/%s', toolchain, toolset)
 				local cxx = string.format('%s/bin/%s++', toolchain, toolset)
 				local ccorcxx = iif(prj.language == 'C', cc, cxx)
@@ -373,7 +374,11 @@
 
 				_p(1, 'add_custom_target(%s', name)
 				_p(2, 'COMMAND')
-				_x(3, 'mkdir -p \\"%s\\"', path.getdirectory(binary))
+				if os.ishost('windows') then
+					_x(3, 'if exist \\"%s\\" (cd .) else (mkdir \\"%s\\")', binarydir, binarydir)
+				else
+					_x(3, 'mkdir -p \\"%s\\"', binarydir)
+				end
 				_p(2, 'COMMAND')
 				_x(3, '%s --gcc-toolchain=%s --sysroot=%s --target=%s -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig %s -Wformat -Werror=format-security %s -x %s-header \\"%s\\" -o \\"%s\\"', ccorcxx, toolchain, sysroot, target, iif(architecture == 'ARM', '-march=armv7-a -m${ANDROID_ARM_MODE}', ''), table.concat(options, ' '), language, header, binary)
 				_p(2, 'BYPRODUCTS')
