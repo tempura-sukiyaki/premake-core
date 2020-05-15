@@ -131,13 +131,15 @@
 			m.keyword,
 			m.projectName,
 			m.preferredToolArchitecture,
-			m.targetPlatformVersionGlobal,
+			m.latestTargetPlatformVersion,
+			m.windowsTargetPlatformVersion,
 		}
 	end
 
 	m.elements.globalsCondition = function(prj, cfg)
 		return {
-			m.targetPlatformVersionCondition,
+			m.windowsTargetPlatformVersion,
+			m.xpDeprecationWarning,
 		}
 	end
 
@@ -2410,6 +2412,7 @@
 		end
 	end
 
+
 	function m.projectGuid(prj)
 		m.element("ProjectGuid", nil, "{%s}", prj.uuid)
 	end
@@ -2580,43 +2583,50 @@
 	end
 
 
-	function m.targetPlatformVersion(cfgOrPrj)
+	function m.latestTargetPlatformVersion(prj)
+		-- See https://developercommunity.visualstudio.com/content/problem/140294/windowstargetplatformversion-makes-it-impossible-t.html
+		if _ACTION == "vs2017" then
+			m.element("LatestTargetPlatformVersion", nil, "$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))")
+		end
+	end
 
-		if _ACTION >= "vs2015" then
-			local min = project.systemversion(cfgOrPrj)
-			-- handle special "latest" version
-			if min == "latest" then
-				-- vs2015 and lower can't build against SDK 10
-				-- vs2019 allows for automatic assignment to latest
-				-- Windows 10 sdk if you set to "10.0"
-				if _ACTION >= "vs2019" then
-					min = "10.0"
-				else
-					min = iif(_ACTION == "vs2017", m.latestSDK10Version(), nil)
-				end
+
+	function m.windowsTargetPlatformVersion(prj, cfg)
+		if _ACTION < "vs2015" then
+			return
+		end
+
+		local target = cfg or prj
+		local version = project.systemversion(target)
+
+		-- if this is a config, only emit if different from project
+		if cfg then
+			local prjVersion = project.systemversion(prj)
+			if not prjVersion or version == prjVersion then
+				return
 			end
-
-			return min
 		end
 
+		-- See https://developercommunity.visualstudio.com/content/problem/140294/windowstargetplatformversion-makes-it-impossible-t.html
+		if version == "latest" then
+			if _ACTION == "vs2015" then
+				version = nil   -- SDK v10 is not supported by VS2015
+			elseif _ACTION == "vs2017" then
+				version = "$(LatestTargetPlatformVersion)"
+			else
+				version = "10.0"
+			end
+		end
+
+		if version then
+			m.element("WindowsTargetPlatformVersion", nil, version)
+		end
 	end
 
 
-	function m.targetPlatformVersionGlobal(prj)
-		local min = m.targetPlatformVersion(prj)
-		if min ~= nil then
-			m.element("WindowsTargetPlatformVersion", nil, min)
-		end
-	end
-
-
-	function m.targetPlatformVersionCondition(prj, cfg)
-
-		local cfgPlatformVersion = m.targetPlatformVersion(cfg)
-		local prjPlatformVersion = m.targetPlatformVersion(prj)
-
-		if cfgPlatformVersion ~= nil and cfgPlatformVersion ~= prjPlatformVersion then
-		    m.element("WindowsTargetPlatformVersion", nil, cfgPlatformVersion)
+	function m.xpDeprecationWarning(prj, cfg)
+		if cfg.toolset == "msc-v141_xp" then
+			m.element("XPDeprecationWarning", nil, "false")
 		end
 	end
 
