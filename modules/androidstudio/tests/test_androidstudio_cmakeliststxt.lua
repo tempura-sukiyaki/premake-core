@@ -417,6 +417,82 @@ endif()
 		]]
 	end
 
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnTargetName()
+		project 'MyProject'
+		kind 'SharedLib'
+		targetname 'MyProject2'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
+		OUTPUT_NAME "MyProject2"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnTargetDir()
+		project 'MyProject'
+		kind 'SharedLib'
+		targetdir '.'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnTargetPrefix()
+		project 'MyProject'
+		kind 'SharedLib'
+		targetprefix 'prefix'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "prefix"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnTargetExtension()
+		project 'MyProject'
+		kind 'SharedLib'
+		targetextension '.b'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".b"
+		)
+endif()
+		]]
+	end
+
 	-- dependson
 
 	function suite.OnProjectCMakeListsTxt_dependson()
