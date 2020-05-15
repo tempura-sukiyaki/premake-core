@@ -5,7 +5,7 @@
 	local p = premake
 
 	if not p.modules.androidstudio then
-		require('android')
+		require("android")
 
 		p.modules.androidstudio = {}
 

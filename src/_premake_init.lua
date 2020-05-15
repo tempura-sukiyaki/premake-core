@@ -1785,6 +1785,10 @@
 
 	-- Add variations for other Posix-like systems.
 
+	filter { "system:android", "kind:WindowedApp" }
+		targetprefix "lib"
+		targetextension ".so"
+
 	filter { "system:darwin", "kind:WindowedApp" }
 		targetextension ".app"
 

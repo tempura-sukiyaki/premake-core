@@ -298,6 +298,125 @@ add_custom_target("MyProject")
 		]]
 	end
 
+	-- buildtarget
+
+	function suite.OnProjectCMakeListsTxt_buildtarget()
+		project 'MyProject'
+		kind 'Utility'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.isemptycapture()
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindSharedLib()
+		project 'MyProject'
+		kind 'SharedLib'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindSharedLibPlatforms()
+		project 'MyProject'
+		kind 'SharedLib'
+		platforms { 'ARM', 'ARM64' }
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	set_target_properties("MyProject" PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindStaticLib()
+		project 'MyProject'
+		kind 'StaticLib'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".a"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindStaticLibPlatforms()
+		project 'MyProject'
+		kind 'StaticLib'
+		platforms { 'ARM', 'ARM64' }
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	set_target_properties("MyProject" PROPERTIES
+		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".a"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindWindowedApp()
+		project 'MyProject'
+		kind 'WindowedApp'
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	set_target_properties("MyProject" PROPERTIES
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnProjectCMakeListsTxt_buildtarget_OnKindWindowedAppPlatforms()
+		project 'MyProject'
+		kind 'WindowedApp'
+		platforms { 'ARM', 'ARM64' }
+		prepare()
+		androidstudio.buildtarget(prj1)
+		test.capture [[
+# buildtarget
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	set_target_properties("MyProject" PROPERTIES
+		OUTPUT_NAME "MyProject"
+		PREFIX "lib"
+		SUFFIX ".so"
+		)
+endif()
+		]]
+	end
+
 	-- dependson
 
 	function suite.OnProjectCMakeListsTxt_dependson()
@@ -484,94 +603,7 @@ endif()
 		]]
 	end
 
-	-- targetdir
-
-	function suite.OnProjectCMakeListsTxt_targetdir()
-		project 'MyProject'
-		kind 'WindowedApp'
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.isemptycapture()
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindSharedLib()
-		project 'MyProject'
-		kind 'SharedLib'
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.capture [[
-# targetdir
-if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
-		)
-endif()
-		]]
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindSharedLibPlatforms()
-		project 'MyProject'
-		kind 'SharedLib'
-		platforms { 'ARM', 'ARM64' }
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.capture [[
-# targetdir
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
-		)
-endif()
-		]]
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindStaticLib()
-		project 'MyProject'
-		kind 'StaticLib'
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.capture [[
-# targetdir
-if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/Debug"
-		)
-endif()
-		]]
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindStaticLibPlatforms()
-		project 'MyProject'
-		kind 'StaticLib'
-		platforms { 'ARM', 'ARM64' }
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.capture [[
-# targetdir
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
-	set_target_properties("MyProject" PROPERTIES
-		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
-		)
-endif()
-		]]
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindWindowedApp()
-		project 'MyProject'
-		kind 'WindowedApp'
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.isemptycapture()
-	end
-
-	function suite.OnProjectCMakeListsTxt_targetdir_OnKindWindowedAppPlatforms()
-		project 'MyProject'
-		kind 'WindowedApp'
-		platforms { 'ARM', 'ARM64' }
-		prepare()
-		androidstudio.targetdir(prj1)
-		test.isemptycapture()
-	end
+	-- compileflags
 
 	function suite.OnProjectCMakeListsTxt_compileflags_OnKindWindowedAppVectorExtensionsARM()
 		project 'MyProject'

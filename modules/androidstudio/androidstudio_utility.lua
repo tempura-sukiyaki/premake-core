@@ -259,5 +259,4 @@
 	-- onstart
 
 	function m.start()
-		_TARGET_OS = p.ANDROID
 	end

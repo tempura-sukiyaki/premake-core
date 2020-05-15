@@ -121,6 +121,30 @@
 	end
 
 
+	function m.buildtarget(prj)
+		local cmakekind = cmake.getkind(prj.kind)
+		if prj.kind == p.STATICLIB or prj.kind == p.SHAREDLIB or prj.kind == p.WINDOWEDAPP then
+			_p(0, '# buildtarget')
+			for cfg in project.eachconfig(prj) do
+				_p(0, ifcondition(cfg))
+				_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
+				if prj.kind == p.STATICLIB then
+					_x(2, 'ARCHIVE_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
+				end
+				if prj.kind == p.SHAREDLIB then
+					_x(2, 'LIBRARY_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
+				end
+				_x(2, 'OUTPUT_NAME %s', cmake.quoted(cfg.buildtarget.basename))
+				_x(2, 'PREFIX %s', cmake.quoted(cfg.buildtarget.prefix))
+				_x(2, 'SUFFIX %s', cmake.quoted(cfg.buildtarget.extension))
+				_p(2, ')')
+				_p(0, 'endif()')
+			end
+			p.outln('')
+		end
+	end
+
+
 	function m.dependson(prj)
 		local options = table.extract(project.getdependencies(prj, 'dependOnly'), 'name')
 		if #options > 0 then
@@ -208,26 +232,6 @@
 					end
 					_p(0, 'endif()')
 				end
-			end
-			p.outln('')
-		end
-	end
-
-
-	function m.targetdir(prj)
-		local cmakekind = cmake.getkind(prj.kind)
-		if prj.kind == p.STATICLIB or prj.kind == p.SHAREDLIB then
-			_p(0, '# targetdir')
-			for cfg in project.eachconfig(prj) do
-				_p(0, ifcondition(cfg))
-				_x(1, 'set_target_properties(%s PROPERTIES', cmake.quoted(prj.name))
-				if prj.kind == p.STATICLIB then
-					_x(2, 'ARCHIVE_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
-				elseif prj.kind == p.SHAREDLIB then
-					_x(2, 'LIBRARY_OUTPUT_DIRECTORY %s', cmake.quoted(cmake.getpath(cfg.buildtarget.directory)))
-				end
-				_p(2, ')')
-				_p(0, 'endif()')
 			end
 			p.outln('')
 		end
@@ -753,11 +757,11 @@
 			m.dependencies,
 			m.project,
 			m.target,
+			m.buildtarget,
 			m.dependson,
 			m.defines,
 			m.sysincludedirs,
 			m.includedirs,
-			m.targetdir,
 			m.dialect,
 			m.compileflags,
 			m.pchheader,
