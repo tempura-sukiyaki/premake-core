@@ -47,7 +47,7 @@
 
 -- cmake_minimum_required
 
-	function suite.OnProjectCMakeListsTxt_cmake_minimum_required()
+	function suite.OnCMakeListsTxt_cmake_minimum_required()
 		prepare()
 		androidstudio.cmake_minimum_required(prj1)
 		test.capture [[
@@ -55,42 +55,46 @@ cmake_minimum_required(VERSION 3.6.4)
 		]]
 	end
 
--- dependencies
+-- workspace
 
-	function suite.OnProjectCMakeListsTxt_dependencies()
+	function suite.OnWorkspaceCMakeListsTxt()
 		prepare()
-		androidstudio.dependencies(prj1)
-		test.isemptycapture()
-	end
-
-	function suite.OnProjectCMakeListsTxt_add_subdirectory_OnDependson()
-		project 'MyProject'
-		dependson { 'MyProject2' }
-		prepare()
-		androidstudio.dependencies(prj1)
+		androidstudio.workspace(wks)
 		test.capture [[
-# dependencies
-if(NOT TARGET "MyProject2")
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_subdirectory(
-		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug"
 		)
 endif()
 		]]
 	end
 
-	function suite.OnProjectCMakeListsTxt_dependencies_OnLinks()
+	function suite.OnWorkspaceCMakeListsTxt_OnObjDir()
 		project 'MyProject'
-		kind 'WindowedApp'
-		links { 'MyProject2' }
+		objdir "."
 		prepare()
-		androidstudio.dependencies(prj1)
+		androidstudio.workspace(wks)
 		test.capture [[
-# dependencies
-if(NOT TARGET "MyProject2")
+if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
 	add_subdirectory(
-		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
-		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject2"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Debug"
+		)
+endif()
+		]]
+	end
+
+	function suite.OnWorkspaceCMakeListsTxt_OnPlatforms()
+		project 'MyProject'
+		platforms { 'ARM', 'ARM64' }
+		prepare()
+		androidstudio.workspace(wks)
+		test.capture [[
+if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+	add_subdirectory(
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
+		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/ARM/Debug"
 		)
 endif()
 		]]

@@ -58,24 +58,22 @@
 	end
 
 
-	function m.cmake_minimum_required(prj)
+	function m.cmake_minimum_required()
 		_x(0, 'cmake_minimum_required(VERSION %s)', table.concat(m.cmake.minimum_required, '.'))
 		p.outln('')
 	end
 
 
-	function m.dependencies(prj)
-		local deps = project.getdependencies(prj)
-		if #deps > 0 then
-			_p(0, '# dependencies')
-			table.foreachi(deps, function(dep)
-				_x(0, 'if(NOT TARGET %s)', cmake.quoted(dep.name))
+	function m.workspace(wks)
+		for prj in p.workspace.eachproject(wks) do
+			for cfg in project.eachconfig(prj) do
+				_p(0, ifcondition(cfg))
 				_p(1, 'add_subdirectory(')
-				_p(2, cmake.quoted(cmake.getpath(dep.location)))
-				_p(2, cmake.quoted(cmake.getpath(dep.location)))
+				_p(2, cmake.quoted(cmake.getpath(prj.location)))
+				_p(2, cmake.quoted(cmake.getpath(cfg.objdir)))
 				_p(2, ')')
 				_p(0, 'endif()')
-			end)
+			end
 			p.outln('')
 		end
 	end
@@ -745,10 +743,21 @@
 
 	m.elements = {}
 
-	m.elements.project_cmakeliststxt = function(prj)
+	m.elements.workspace_cmakeliststxt = function()
 		return {
 			m.cmake_minimum_required,
-			m.dependencies,
+			m.workspace,
+		}
+	end
+
+	function m.generate_workspace_cmakeliststxt(wks)
+		p.utf8()
+		p.callArray(m.elements.workspace_cmakeliststxt, wks)
+	end
+
+	m.elements.project_cmakeliststxt = function()
+		return {
+			m.cmake_minimum_required,
 			m.project,
 			m.target,
 			m.buildtarget,

@@ -69,6 +69,7 @@
 				p.generate(wks, "local.properties", p.modules.androidstudio.generate_workspace_localproperties)
 			end
 			p.generate(wks, "settings.gradle", p.modules.androidstudio.generate_workspace_settingsgradle)
+			p.generate(wks, "CMakeLists.txt", p.modules.androidstudio.generate_workspace_cmakeliststxt)
 		end,
 
 		onProject = function(prj)

@@ -282,7 +282,7 @@ android {
 	}
 	externalNativeBuild {
 		cmake {
-			path "CMakeLists.txt"
+			path "../CMakeLists.txt"
 		}
 	}
 	flavorDimensions "premakePlatforms"
@@ -473,7 +473,7 @@ android {
 	}
 	externalNativeBuild {
 		cmake {
-			path "CMakeLists.txt"
+			path "../CMakeLists.txt"
 		}
 	}
 	flavorDimensions "premakePlatforms"
@@ -570,7 +570,7 @@ android {
 	}
 	externalNativeBuild {
 		cmake {
-			path "CMakeLists.txt"
+			path "../CMakeLists.txt"
 		}
 	}
 	flavorDimensions "premakePlatforms"

@@ -240,7 +240,7 @@
 				['android.defaultConfig.minSdkVersion'] = 14,
 				['android.defaultConfig.versionCode'] = 1,
 				['android.defaultConfig.versionName'] = '1.0',
-				['android.externalNativeBuild.cmake.path'] = 'CMakeLists.txt',
+				['android.externalNativeBuild.cmake.path'] = path.getrelative(prj.location, path.join(prj.workspace.location, 'CMakeLists.txt')),
 			}, prj.projectbuildgradle)
 			for key, value in pairs(tbl) do
 				local indices1 = split_index(key)
