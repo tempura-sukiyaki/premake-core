@@ -48,7 +48,7 @@
 
 
 	function cmake.quoted(str)
-		return '"' .. string.gsub(str, '[\\\"]', '\\%0') .. '"'
+		return '"' .. string.gsub(str, '[\\\"]', '\\%1') .. '"'
 	end
 
 

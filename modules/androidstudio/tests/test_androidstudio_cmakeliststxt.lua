@@ -769,11 +769,26 @@ endif()
 		test.capture [[
 # pchheader
 if("Debug" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")
+	file(MAKE_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug")
+	set(PREMAKE_CMAKE_FLAGS "${CMAKE_CXX_FLAGS}")
+	if("Debug" STREQUAL "${CMAKE_BUILD_TYPE}")
+		set(PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}${CMAKE_CXX_FLAGS_DEBUG}")
+	endif()
+	if("MinSizeRel" STREQUAL "${CMAKE_BUILD_TYPE}")
+		set(PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}${CMAKE_CXX_FLAGS_MINSIZEREL}")
+	endif()
+	if("Release" STREQUAL "${CMAKE_BUILD_TYPE}")
+		set(PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}${CMAKE_CXX_FLAGS_RELEASE}")
+	endif()
+	if("RelWithDebInfo" STREQUAL "${CMAKE_BUILD_TYPE}")
+		set(PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+	endif()
+	string(REPLACE " " ";" PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}")
 	add_custom_target("MyProjectDebugGeneratePCH"
 		COMMAND
-			mkdir -p \"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug\"
-		COMMAND
-			${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64/bin/gcc++ --gcc-toolchain=${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/darwin-x86_64/sysroot --target=armv7-none-linux-androideabi${ANDROID_NATIVE_API_LEVEL} -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -m${ANDROID_ARM_MODE} -Wformat -Werror=format-security  -x c++-header \"${PREMAKE_MAIN_SCRIPT_DIR}/header.h\" -o \"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch\"
+			"${ANDROID_CXX_COMPILER}" --gcc-toolchain="${ANDROID_TOOLCHAIN_ROOT}" --sysroot="${CMAKE_SYSROOT}" --target="${ANDROID_LLVM_TRIPLE}" ${PREMAKE_CMAKE_FLAGS} -x c++-header "${PREMAKE_MAIN_SCRIPT_DIR}/header.h" -o "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch"
+		DEPENDS
+			"${PREMAKE_MAIN_SCRIPT_DIR}/header.h"
 		BYPRODUCTS
 			"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/Debug/4A2EAAF3-B6E7-149E-3F47-2F78ABFFCA0D.pch"
 		WORKING_DIRECTORY

@@ -318,73 +318,67 @@
 
 				pch = cmake.getpath(pch)
 
+				local binary = cmake.getpath(path.join(cfg.objdir, os.uuid(pch) .. '.pch'))
+				local binarydir = path.getdirectory(binary)
+				local name = cmake.quoted(prj.name .. (cfg.platform or '') .. cfg.buildcfg .. 'GeneratePCH')
+
+				local compiler = iif(prj.language == 'C', '${ANDROID_C_COMPILER}', '${ANDROID_CXX_COMPILER}')
+				local cmakelanguage = iif(prj.language == 'C', 'C', 'CXX')
+				local language = iif(prj.language == 'C', 'c', 'c++')
+
+				local function optquoted(x)
+					if string.find(x, '[ $]') then
+						return cmake.quoted(x)
+					end
+					return x
+				end
+
 				local options = table.flatten {
 					getdefines(cfg, function (opt)
-						return string.gsub('"-D' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+						return '-D' .. optquoted(opt)
 					end),
 					getsysincludedirs(cfg, function (opt)
-						return string.gsub('"-isystem ' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+						return '-isystem ' .. optquoted(opt)
 					end),
 					getincludedirs(cfg, function (opt)
-						return string.gsub('"-I' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+						return '-I' .. optquoted(opt)
 					end),
-					getcompileflags(cfg, function (opt)
-						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
-					end),
+					'${PREMAKE_CMAKE_FLAGS}',
+					getcompileflags(cfg, optquoted),
 					getforceincludes(cfg, function (opt)
-						return string.gsub('"-include ' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
+						return '-include ' .. optquoted(opt)
 					end),
-					getwarnings(cfg, function (opt)
-						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
-					end),
-					getbuildoptions(cfg, function (opt)
-						return string.gsub('"' .. string.gsub(opt, '[\\"()]', '\\%1') .. '"', '[\\"()]', '\\%1')
-					end),
+					getwarnings(cfg, optquoted),
+					getbuildoptions(cfg, optquoted),
+					(function ()
+						if prj.language == 'C' then
+							local dialect = cmake.cdialect(cfg)
+							if dialect then
+								return '-std=gnu' .. dialect
+							end
+						else
+							local dialect = cmake.cppdialect(cfg)
+							if dialect then
+								return '-std=gnu++' .. dialect
+							end
+						end
+					end)(),
 				}
-				if not prj.language or prj.language == 'C++' then
-					local cppdialect = cmake.cppdialect(cfg)
-					if cppdialect then
-						table.insert(options, '-std=gnu++' .. cppdialect)
-					end
-				elseif prj.language == 'C' then
-					local cdialect = cmake.cdialect(cfg)
-					if cdialect then
-						table.insert(options, '-std=gnu' .. cdialect)
-					end
-				end
-				--table.sort(options)
-
-				local name = cmake.quoted(prj.name .. (cfg.platform or '') .. cfg.buildcfg .. 'GeneratePCH')
-				local host = 'linux'
-				if os.ishost('macosx') then
-					host = 'darwin'
-				elseif os.ishost('windows') then
-					host = 'windows'
-				end
-				local toolchain = string.format('${CMAKE_ANDROID_NDK}/toolchains/llvm/prebuilt/%s-x86_64', host)
-				local toolset = cfg.toolset
-				local architecture = cfg.architecture or 'ARM'
-				local target = ({ARM = 'armv7-none-linux-androideabi', ARM64 = 'aarch64-none-linux-android', x86 = 'i686-none-linux-android', x86_64 = 'x86_64-none-linux-android'})[architecture] .. '${ANDROID_NATIVE_API_LEVEL}'
-				local language = string.lower(prj.language)
-				local header = string.gsub(pch, '[\\"()]', '\\%1')
-				local binary = string.gsub(cmake.getpath(path.join(cfg.objdir, os.uuid(pch) .. '.pch')), '[\\"()]', '\\%1')
-				local binarydir = path.getdirectory(binary)
-				local cc = string.format('%s/bin/%s', toolchain, toolset)
-				local cxx = string.format('%s/bin/%s++', toolchain, toolset)
-				local ccorcxx = iif(prj.language == 'C', cc, cxx)
-				local sysroot = string.format('%s/sysroot', toolchain)
 
 				_p(0, ifcondition(cfg))
-
+				_x(1, 'file(MAKE_DIRECTORY "%s")', binarydir)
+				_x(1, 'set(PREMAKE_CMAKE_FLAGS "${CMAKE_%s_FLAGS}")', cmakelanguage)
+				for _, cmakeconfig in ipairs({ 'Debug', 'MinSizeRel', 'Release', 'RelWithDebInfo' }) do
+					_x(1, 'if("%s" STREQUAL "${CMAKE_BUILD_TYPE}")', cmakeconfig)
+					_x(2, 'set(PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}${CMAKE_%s_FLAGS_%s}")', cmakelanguage, string.upper(cmakeconfig))
+					_p(1, 'endif()')
+				end
+				_p(1, 'string(REPLACE " " ";" PREMAKE_CMAKE_FLAGS "${PREMAKE_CMAKE_FLAGS}")')
 				_p(1, 'add_custom_target(%s', name)
 				_p(2, 'COMMAND')
-				if os.ishost('windows') then
-					_x(3, 'if exist \\"%s\\" (cd .) else (mkdir \\"%s\\")', binarydir, binarydir)
-				else
-					_x(3, 'mkdir -p \\"%s\\"', binarydir)
-				end
-				_p(2, 'COMMAND')
-				_x(3, '%s --gcc-toolchain=%s --sysroot=%s --target=%s -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig %s -Wformat -Werror=format-security %s -x %s-header \\"%s\\" -o \\"%s\\"', ccorcxx, toolchain, sysroot, target, iif(architecture == 'ARM', '-march=armv7-a -m${ANDROID_ARM_MODE}', ''), table.concat(options, ' '), language, header, binary)
+				_x(3, '"%s" --gcc-toolchain="${ANDROID_TOOLCHAIN_ROOT}" --sysroot="${CMAKE_SYSROOT}" --target="${ANDROID_LLVM_TRIPLE}" %s -x %s-header %s -o %s', compiler, table.concat(options, ' '), language, cmake.quoted(pch), cmake.quoted(binary))
+				_p(2, 'DEPENDS')
+				_x(3, '%s', cmake.quoted(pch))
 				_p(2, 'BYPRODUCTS')
 				_x(3, '%s', cmake.quoted(binary))
 				_p(2, 'WORKING_DIRECTORY')
