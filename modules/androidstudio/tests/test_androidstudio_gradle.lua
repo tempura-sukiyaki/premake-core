@@ -285,7 +285,7 @@ android {
 			path "../CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premakePlatforms"
+	flavorDimensions "premakePlatform"
 }
 		]]
 	end
@@ -476,10 +476,10 @@ android {
 			path "../CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premakePlatforms"
+	flavorDimensions "premakePlatform"
 	productFlavors {
 		ARM {
-			dimension "premakePlatforms"
+			dimension "premakePlatform"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM"
@@ -490,7 +490,7 @@ android {
 			}
 		}
 		ARM64 {
-			dimension "premakePlatforms"
+			dimension "premakePlatform"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM64"
@@ -501,7 +501,7 @@ android {
 			}
 		}
 		x86 {
-			dimension "premakePlatforms"
+			dimension "premakePlatform"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=x86"
@@ -512,7 +512,7 @@ android {
 			}
 		}
 		x86_64 {
-			dimension "premakePlatforms"
+			dimension "premakePlatform"
 			externalNativeBuild {
 				cmake {
 					arguments "-DPREMAKE_CONFIG_PLATFORM=x86_64"
@@ -573,7 +573,7 @@ android {
 			path "../CMakeLists.txt"
 		}
 	}
-	flavorDimensions "premakePlatforms"
+	flavorDimensions "premakePlatform"
 	sourceSets {
 		main {
 			java {

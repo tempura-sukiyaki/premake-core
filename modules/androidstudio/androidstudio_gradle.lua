@@ -266,7 +266,7 @@
 		do
 			local indices = split_index('android.flavorDimensions')
 			local key, value = get_indices_and_value(buildgradle, indices)
-			buildgradle[key or indices] = table.unique(table.flatten({ 'premakePlatforms', value }))
+			buildgradle[key or indices] = table.unique(table.flatten({ 'premakePlatform', value }))
 		end
 
 		for cfg in project.eachconfig(prj) do
@@ -298,7 +298,7 @@
 					local indices = split_index('android.productFlavors[%s].dimension', quoted(cfg.platform, true))
 					local key, value = get_indices_and_value(buildgradle, indices)
 					if not key then
-						buildgradle[indices] = 'premakePlatforms'
+						buildgradle[indices] = 'premakePlatform'
 					end
 				end
 
