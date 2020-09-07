@@ -490,7 +490,7 @@ android {
 				abiFilters "arm64-v8a"
 			}
 		}
-		all {
+		All {
 			dimension "premakePlatform"
 			ndk {
 				abiFilters "arm64-v8a", "armeabi-v7a", "x86", "x86_64"

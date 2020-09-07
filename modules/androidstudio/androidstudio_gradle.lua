@@ -333,18 +333,18 @@
 		end
 
 		if #abis > 0 then
-			-- android.productFlavors.all.dimension
+			-- android.productFlavors.All.dimension
 			do
-				local indices = split_index('android.productFlavors.all.dimension')
+				local indices = split_index('android.productFlavors.All.dimension')
 				local key, value = get_indices_and_value(buildgradle, indices)
 				if not key then
 					buildgradle[indices] = 'premakePlatform'
 				end
 			end
 
-			-- android.productFlavors.all.ndk.abiFilters
+			-- android.productFlavors.All.ndk.abiFilters
 			do
-				local indices = split_index('android.productFlavors.all.ndk.abiFilters')
+				local indices = split_index('android.productFlavors.All.ndk.abiFilters')
 				local key, value = get_indices_and_value(buildgradle, indices)
 				if not key then
 					buildgradle[indices] = abis
