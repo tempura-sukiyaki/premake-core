@@ -269,6 +269,7 @@
 			buildgradle[key or indices] = table.unique(table.flatten({ 'premakePlatform', value }))
 		end
 
+		local abis = {}
 		for cfg in project.eachconfig(prj) do
 			local buildcfg = string.lower(cfg.buildcfg)
 
@@ -293,6 +294,24 @@
 			end
 
 			if cfg.platform then
+				do
+					local abi = architecture_to_abi(cfg.architecture)
+					if not table.contains(abis, abi) then
+						table.insertsorted(abis, abi)
+					end
+				end
+
+				-- android.productFlavors.%{cfg.platform}.externalNativeBuild.cmake.arguments
+				--do
+				--	local indices = split_index('android.productFlavors[%s].externalNativeBuild.cmake.arguments', quoted(cfg.platform, true))
+				--	local key, value = get_indices_and_value(buildgradle, indices)
+				--	value = table.unique(table.flatten({
+				--		'-DPREMAKE_CONFIG_PLATFORM=' .. cfg.platform,
+				--		value,
+				--	}))
+				--	buildgradle[key or indices] = value
+				--end
+
 				-- android.productFlavors.%{cfg.platform}.dimension
 				do
 					local indices = split_index('android.productFlavors[%s].dimension', quoted(cfg.platform, true))
@@ -302,17 +321,6 @@
 					end
 				end
 
-				-- android.productFlavors.%{cfg.platform}.externalNativeBuild.cmake.arguments
-				do
-					local indices = split_index('android.productFlavors[%s].externalNativeBuild.cmake.arguments', quoted(cfg.platform, true))
-					local key, value = get_indices_and_value(buildgradle, indices)
-					value = table.unique(table.flatten({
-						'-DPREMAKE_CONFIG_PLATFORM=' .. cfg.platform,
-						value,
-					}))
-					buildgradle[key or indices] = value
-				end
-
 				-- android.productFlavors.%{cfg.platform}.ndk.abiFilters
 				do
 					local indices = split_index('android.productFlavors[%s].ndk.abiFilters', quoted(cfg.platform, true))
@@ -320,6 +328,26 @@
 					if not key then
 						buildgradle[indices] = architecture_to_abi(cfg.architecture)
 					end
+				end
+			end
+		end
+
+		if #abis > 0 then
+			-- android.productFlavors.all.dimension
+			do
+				local indices = split_index('android.productFlavors.all.dimension')
+				local key, value = get_indices_and_value(buildgradle, indices)
+				if not key then
+					buildgradle[indices] = 'premakePlatform'
+				end
+			end
+
+			-- android.productFlavors.all.ndk.abiFilters
+			do
+				local indices = split_index('android.productFlavors.all.ndk.abiFilters')
+				local key, value = get_indices_and_value(buildgradle, indices)
+				if not key then
+					buildgradle[indices] = abis
 				end
 			end
 		end

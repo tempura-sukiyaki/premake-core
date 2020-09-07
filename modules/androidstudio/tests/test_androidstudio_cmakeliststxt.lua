@@ -91,7 +91,7 @@ endif()
 		prepare()
 		androidstudio.workspace(wks)
 		test.capture [[
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	add_subdirectory(
 		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject"
 		"${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/obj/ARM/Debug"
@@ -197,7 +197,7 @@ endif()
 		prepare()
 		androidstudio.target(prj1)
 		test.capture [[
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -241,7 +241,7 @@ endif()
 		prepare()
 		androidstudio.target(prj1)
 		test.capture [[
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	add_library("MyProject" STATIC
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -285,7 +285,7 @@ endif()
 		prepare()
 		androidstudio.target(prj1)
 		test.capture [[
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	add_library("MyProject" SHARED
 		"${PREMAKE_MAIN_SCRIPT_DIR}/file.cpp"
 		)
@@ -338,7 +338,7 @@ endif()
 		androidstudio.buildtarget(prj1)
 		test.capture [[
 # buildtarget
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	set_target_properties("MyProject" PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		OUTPUT_NAME "MyProject"
@@ -375,7 +375,7 @@ endif()
 		androidstudio.buildtarget(prj1)
 		test.capture [[
 # buildtarget
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	set_target_properties("MyProject" PROPERTIES
 		ARCHIVE_OUTPUT_DIRECTORY "${PREMAKE_MAIN_SCRIPT_DIR}/Workspace/MyProject/bin/ARM/Debug"
 		OUTPUT_NAME "MyProject"
@@ -411,7 +411,7 @@ endif()
 		androidstudio.buildtarget(prj1)
 		test.capture [[
 # buildtarget
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	set_target_properties("MyProject" PROPERTIES
 		OUTPUT_NAME "MyProject"
 		PREFIX "lib"
@@ -568,7 +568,7 @@ endif()
 		androidstudio.sysincludedirs(prj1)
 		test.capture [[
 # sysincludedirs
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_include_directories("MyProject" SYSTEM PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/sysinclude"
 		)
@@ -601,7 +601,7 @@ endif()
 		androidstudio.includedirs(prj1)
 		test.capture [[
 # includedirs
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_include_directories("MyProject" PRIVATE
 		"${PREMAKE_MAIN_SCRIPT_DIR}/include"
 		)
@@ -644,7 +644,7 @@ endif()
 		androidstudio.defines(prj1)
 		test.capture [[
 # defines
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_definitions("MyProject" PRIVATE "DEFINE")
 endif()
 		]]
@@ -694,7 +694,7 @@ endif()
 		androidstudio.compileflags(prj1)
 		test.capture [[
 # compileflags
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_options("MyProject" PRIVATE
 		"-mfpu=neon"
 		)
@@ -753,7 +753,7 @@ endif()
 		androidstudio.forceincludes(prj1)
 		test.capture [[
 # forceincludes
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	set_target_properties("MyProject" PROPERTIES
 		COMPILE_FLAGS "-include ${PREMAKE_MAIN_SCRIPT_DIR}/file.h"
 		)
@@ -834,7 +834,7 @@ endif()
 		androidstudio.warnings(prj1)
 		test.capture [[
 # warnings
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wno-warning"
 		)
@@ -867,7 +867,7 @@ endif()
 		androidstudio.warnings(prj1)
 		test.capture [[
 # warnings
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_options("MyProject" PRIVATE
 		"-Wwarning"
 		)
@@ -900,7 +900,7 @@ endif()
 		androidstudio.warnings(prj1)
 		test.capture [[
 # warnings
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_options("MyProject" PRIVATE
 		"-Werror=warning"
 		)
@@ -933,7 +933,7 @@ endif()
 		androidstudio.buildoptions(prj1)
 		test.capture [[
 # buildoptions
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_compile_options("MyProject" PRIVATE
 		"buildoption"
 		)
@@ -979,7 +979,7 @@ endif()
 		androidstudio.libdirs(prj1)
 		test.capture [[
 # libdirs
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/syslibdir"
 		)
@@ -1012,7 +1012,7 @@ endif()
 		androidstudio.libdirs(prj1)
 		test.capture [[
 # libdirs
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_link_libraries("MyProject" PRIVATE
 		"-L${PREMAKE_MAIN_SCRIPT_DIR}/libdir"
 		)
@@ -1060,7 +1060,7 @@ endif()
 		androidstudio.links(prj1)
 		test.capture [[
 # links
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	target_link_libraries("MyProject" PRIVATE
 		"-Wl,--start-group"
 		"link"
@@ -1129,7 +1129,7 @@ endif()
 		androidstudio.buildcommands(prj1)
 		test.capture [[
 # buildcommands
-if("Debug|ARM" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")
+if("Debug|armeabi-v7a" STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")
 	# input -> output
 	add_custom_target("MyProjectARMDebugBuildcommand1"
 		COMMAND

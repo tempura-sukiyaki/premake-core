@@ -52,7 +52,8 @@
 
 	local function ifcondition(cfg)
 		if cfg.platform then
-			return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${PREMAKE_CONFIG_PLATFORM}")', cmake.quoted(cfg.name)
+			local lut = { ARM = 'armeabi-v7a', ARM64 = 'arm64-v8a' }
+ 			return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}|${ANDROID_ABI}")', cmake.quoted(cfg.buildcfg .. '|' .. lut[cfg.architecture] or cfg.architecture)
 		end
 		return 'if(%s STREQUAL "${PREMAKE_CONFIG_BUILDCFG}")', cmake.quoted(cfg.buildcfg)
 	end

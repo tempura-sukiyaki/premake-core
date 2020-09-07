@@ -480,44 +480,30 @@ android {
 	productFlavors {
 		ARM {
 			dimension "premakePlatform"
-			externalNativeBuild {
-				cmake {
-					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM"
-				}
-			}
 			ndk {
 				abiFilters "armeabi-v7a"
 			}
 		}
 		ARM64 {
 			dimension "premakePlatform"
-			externalNativeBuild {
-				cmake {
-					arguments "-DPREMAKE_CONFIG_PLATFORM=ARM64"
-				}
-			}
 			ndk {
 				abiFilters "arm64-v8a"
 			}
 		}
+		all {
+			dimension "premakePlatform"
+			ndk {
+				abiFilters "arm64-v8a", "armeabi-v7a", "x86", "x86_64"
+			}
+		}
 		x86 {
 			dimension "premakePlatform"
-			externalNativeBuild {
-				cmake {
-					arguments "-DPREMAKE_CONFIG_PLATFORM=x86"
-				}
-			}
 			ndk {
 				abiFilters "x86"
 			}
 		}
 		x86_64 {
 			dimension "premakePlatform"
-			externalNativeBuild {
-				cmake {
-					arguments "-DPREMAKE_CONFIG_PLATFORM=x86_64"
-				}
-			}
 			ndk {
 				abiFilters "x86_64"
 			}
