@@ -26,7 +26,11 @@
 		project '*'
 		location 'Workspace'
 		project 'MyProject'
+		kind 'WindowedApp'
 		location 'Workspace/MyProject'
+		project 'MyAssetPack'
+		kind 'AssetPack'
+		location 'Workspace/MyAssetPack'
 		wks = p.oven.bakeWorkspace(wks)
 		prj = test.getproject(wks, 1)
 		androidstudio.generate_workspace_settingsgradle(wks)
@@ -40,9 +44,24 @@
 		project '*'
 		location 'Workspace'
 		project 'MyProject'
+		kind 'WindowedApp'
 		location 'Workspace/MyProject'
 		wks = p.oven.bakeWorkspace(wks)
 		prj = test.getproject(wks, 1)
+		androidstudio.generate_project_buildgradle(prj)
+	end
+
+	local function prepare_projectbuildgradle_assetpack()
+		project '*'
+		location 'Workspace'
+		project 'MyProject'
+		kind 'WindowedApp'
+		location 'Workspace/MyProject'
+		project 'MyAssetPack'
+		kind 'AssetPack'
+		location 'Workspace/MyAssetPack'
+		wks = p.oven.bakeWorkspace(wks)
+		prj = test.getproject(wks, 2)
 		androidstudio.generate_project_buildgradle(prj)
 	end
 
@@ -55,10 +74,14 @@
 	function suite.OnWorkspaceSettingsGradle()
 		project 'MyProject'
 		kind 'WindowedApp'
+		project 'MyAssetPack'
+		kind 'AssetPack'
 		prepare_workspacesettingsgradle()
 		test.capture [[
 include(":MyProject")
 project(":MyProject").setProjectDir(file("MyProject"))
+
+include(":MyAssetPack")
 		]]
 	end
 
@@ -573,6 +596,24 @@ android {
 			}
 		}
 	}
+}
+		]]
+	end
+
+	function suite.OnProjectBuildGradle_AssetPack()
+		project 'MyAssetPack'
+		projectbuildgradle {
+			['assetPack.dynamicDelivery.deliveryType'] = 'install-time',
+		}
+		prepare_projectbuildgradle_assetpack()
+		test.capture [[
+apply plugin: "com.android.asset-pack"
+
+assetPack {
+	dynamicDelivery {
+		deliveryType = "install-time"
+	}
+	packName = "MyAssetPack"
 }
 		]]
 	end

@@ -224,7 +224,29 @@
 	end
 
 
-	function m.generate_project_buildgradle(prj)
+	local function generate_assetpack_buildgradle(prj)
+		local buildgradle = {}
+		do
+			local tbl = table.merge({
+				['assetPack.packName'] = prj.name,
+			}, prj.projectbuildgradle)
+			for key, value in pairs(tbl) do
+				local indices1 = split_index(key)
+				local indices2, _ = get_indices_and_value(buildgradle, indices1)
+				buildgradle[indices2 or indices1] = value
+			end
+		end
+
+		-- apply plugin
+		p.x('apply plugin: "com.android.asset-pack"')
+		p.outln('')
+		write_gradle(buildgradle, function (indices, key, value)
+			p.x('%s = %s', key, value)
+		end)
+	end
+
+
+	local function generate_windowedapp_buildgradle(prj)
 		local function architecture_to_abi(arch)
 			local LUT = {
 				[p.ARM] = 'armeabi-v7a',
@@ -408,6 +430,15 @@
 	end
 
 
+	function m.generate_project_buildgradle(prj)
+		if prj.kind == p.WINDOWEDAPP then
+			generate_windowedapp_buildgradle(prj)
+		elseif prj.kind == p.ASSETPACK then
+			generate_assetpack_buildgradle(prj)
+		end
+	end
+
+
 	function m.generate_workspace_settingsgradle(wks)
 		for prj in p.workspace.eachproject(wks) do
 			if prj.kind == p.WINDOWEDAPP then
@@ -415,6 +446,10 @@
 				local file = quoted(path.getrelative(wks.location, prj.location), true)
 				p.x('include(%s)', name)
 				p.x('project(%s).setProjectDir(file(%s))', name, file)
+				p.outln('')
+			elseif prj.kind == p.ASSETPACK then
+				local name = quoted(':' .. prj.name, true)
+				p.x('include(%s)', name)
 				p.outln('')
 			end
 		end
