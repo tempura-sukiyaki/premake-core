@@ -9,6 +9,8 @@
 -- Register Android Studio workspace API.
 --
 
+	p.api.addAllowed("kind", p.ASSETPACK)
+
 	-- build.gradle
 	p.api.register {
 		name = "workspacebuildgradle",
