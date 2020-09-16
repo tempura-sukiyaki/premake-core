@@ -9,6 +9,8 @@
 -- Register Android Studio workspace API.
 --
 
+	p.api.addAllowed("kind", p.ASSETPACK)
+
 	-- build.gradle
 	p.api.register {
 		name = "workspacebuildgradle",
@@ -52,7 +54,7 @@
 
 		toolset = "gcc",
 
-		valid_kinds = { "WindowedApp", "SharedLib", "StaticLib", "Utility", "None" },
+		valid_kinds = { "WindowedApp", "SharedLib", "StaticLib", "Utility", "AssetPack", "None" },
 		valid_languages = { "C", "C++" },
 		valid_tools = {
 			cc = { "clang", 'gcc' },
@@ -73,7 +75,8 @@
 		end,
 
 		onProject = function(prj)
-			if prj.kind == p.WINDOWEDAPP then
+			if prj.kind == p.WINDOWEDAPP
+			or prj.kind == p.ASSETPACK then
 				p.generate(prj, "build.gradle", p.modules.androidstudio.generate_project_buildgradle)
 			end
 			if prj.kind == p.SHAREDLIB
