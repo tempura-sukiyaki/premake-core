@@ -68,12 +68,14 @@
 	function m.workspace(wks)
 		for prj in p.workspace.eachproject(wks) do
 			for cfg in project.eachconfig(prj) do
-				_p(0, ifcondition(cfg))
-				_p(1, 'add_subdirectory(')
-				_p(2, cmake.quoted(cmake.getpath(prj.location)))
-				_p(2, cmake.quoted(cmake.getpath(cfg.objdir)))
-				_p(2, ')')
-				_p(0, 'endif()')
+				if prj.kind ~= p.ASSETPACK then
+					_p(0, ifcondition(cfg))
+					_p(1, 'add_subdirectory(')
+					_p(2, cmake.quoted(cmake.getpath(prj.location)))
+					_p(2, cmake.quoted(cmake.getpath(cfg.objdir)))
+					_p(2, ')')
+					_p(0, 'endif()')
+				end
 			end
 			p.outln('')
 		end
