@@ -711,6 +711,7 @@
 			"WindowedApp",
 			"Utility",
 			"SharedItems",
+			"AssetPack",
 		},
 	}
 
