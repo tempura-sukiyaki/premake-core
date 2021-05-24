@@ -90,6 +90,20 @@
 		description = "Embed scripts as bytecode instead of stripped souce code"
 	}
 
+	newoption {
+		trigger = "arch",
+		value = "arch",
+		description = "Set the architecture of the binary to be built.",
+		allowed = {
+			{ "arm", "ARM (Linux or Windows only)" },
+			{ "arm64", "ARM64" },
+			{ "x86", "x86 (Linux or Windows only)" },
+			{ "x86_64", "x86_64" },
+			{ "universal", "Universal Binary (macOS only)" },
+		},
+		default = iif(os.istarget('macosx'), "x86_64", "x86"),
+	}
+
 --
 -- Define the project. Put the release configuration first so it will be the
 -- default when folks build using the makefile. That way they don't have to
@@ -116,8 +130,37 @@
 			defines { "CURL_STATICLIB", "PREMAKE_CURL"}
 		end
 
-		filter { 'system:windows' }
-			platforms   { 'x86', 'x64' }
+		filter { "system:linux", "options:arch=arm" }
+			buildoptions { "-arch arm" }
+			linkoptions { "-arch arm" }
+
+		filter { "system:windows", "options:arch=arm" }
+			platforms { "ARM" }
+
+		filter { "system:linux and macosx", "options:arch=arm64" }
+			buildoptions { "-arch arm64" }
+			linkoptions { "-arch arm64" }
+
+		filter { "system:windows", "options:arch=arm64" }
+			platforms { "ARM64" }
+
+		filter { "system:linux", "options:arch=x86" }
+			buildoptions { "-arch x86" }
+			linkoptions { "-arch x86" }
+
+		filter { "system:windows", "options:arch=x86" }
+			platforms { "WIN32" }
+
+		filter { "system:linux and macosx", "options:arch=x86_64" }
+			buildoptions { "-arch x86_64" }
+			linkoptions { "-arch x86_64" }
+
+		filter { "system:windows", "options:arch=x86_64" }
+			platforms { "x64" }
+
+		filter { "system:macosx", "options:arch=universal" }
+			buildoptions { "-arch arm64", "-arch x86_64" }
+			linkoptions { "-arch arm64", "-arch x86_64" }
 
 		filter "configurations:Debug"
 			defines     "_DEBUG"
